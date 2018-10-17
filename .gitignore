@@ -1,0 +1,6 @@
+*.csv
+*.tsv
+*.txt
+
+.vscode
+.vscode/settings.json
