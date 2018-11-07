@@ -12,9 +12,6 @@ matchingSequences = []
 #  sequences holds the last numResidues residues of every sequence
 sequences = []
 
-#  sequences holds the last numResidues residues of every sequence
-sequences = []
-
 currentSequence = "" # the current chunk of amino acids
 currentLabel = ""
 sequenceLabel = ""
