@@ -114,7 +114,9 @@ if __name__ == "__main__":
         howToSort = [0, True]
 
     importantPositions = getImportantPositions(args.inputValues)
-    pList = [i[0] for i in importantPositions]
+    pList = []
+    for i in importantPositions:
+        pList.append(i[0])
 
     # start timer
     startTime = time.clock()
