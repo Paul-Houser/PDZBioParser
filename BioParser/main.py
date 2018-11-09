@@ -3,32 +3,12 @@ import argparse
 import datetime
 import time
 import os
-from dl import getFasta
+import math
 from structure import structure
 from parse import read_file
 from fileOutput import *
 
-# [0, False] is the default sort, that runInParallel uses
-howToSort = [0, False]
-
-#  setup variables
-currentFile = ""
-searchPosition = None
-fileNames = ""
-numResidues = None
-
-#  unfound organisms
-unFound = ""
-
-#  create dict of all the specified positions and criteria
-importantPositions = []
-
-#  creates a list of all numerical important positions
-pList = []
-
-
 def parseArgs():
-
     #  handle command line arguments
     parser = argparse.ArgumentParser(
         description='Process C-terminal decameric matchingSequences')
@@ -47,30 +27,7 @@ def parseArgs():
                         help='Add this flag to silence printout of ratios')
     parser.add_argument('inputValues', nargs='+',
                         help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
-
     return parser.parse_args()
-
-
-def makeFile():
-    path = str(os.getcwd()) + "/unfoundOrganisms.txt"
-    if not os.path.exists(path):
-        f = open(path, "w")
-        f.close()
-
-
-# assigning howToSort from command line input
-# first value is 0,1 meaning key or value, second is reverse = true or false
-def assignSort(sort):
-    global howToSort
-
-    if sort == 0:
-        howToSort = [1, False]
-    if sort == 1:
-        howToSort = [1, True]
-    if sort == 2:
-        howToSort = [0, False]
-    if sort == 3:
-        howToSort = [0, True]
 
 #  creates necessary folders to put downloads, csv's, and combined data in.
 def makeFolders():
@@ -80,12 +37,9 @@ def makeFolders():
         if not os.path.exists(file_path):
             os.makedirs(file_path)
 
-
-
-
-
 #  gets all important positions from args.inputValues and adds them to the list 'importantPositions'
 def getImportantPositions(inputValues):
+    importantPositions = []
     for i in inputValues:
         currentValue = []
         currentPosition = ""
@@ -98,12 +52,10 @@ def getImportantPositions(inputValues):
             else:
                 currentValue.append(i[j])
         importantPositions.append(currentValue)
+    return importantPositions
 
-def getPosList():
-    for i in importantPositions:
-        pList.append(i[0])
-
-def setUpStructure(silent, o):
+# sets up object containing all output information
+def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPositions, howToSort, silent, o):
     for file in fileNames:
 
         # setup class
@@ -116,6 +68,7 @@ def setUpStructure(silent, o):
         currentStructure.howToSort = howToSort
 
         # parse file
+        # if file cannot be found, add to unfound organisms
         currentStructure = read_file(currentStructure)
         if not (currentStructure):
             unFoundOrgs(file.split(".")[0])
@@ -133,52 +86,40 @@ def setUpStructure(silent, o):
                 currentStructure.enrichment, False, searchPosition, howToSort, silent)
         if (o):
             printSequencesAndIdentifiers(currentStructure)
-
-
-
-
-
-#####################################################################################
-
-def main():
-    global currentFile
-    global searchPosition
-    global fileNames
-    global numResidues
-
-    args = parseArgs()
-
-    #  setup variables
-    currentFile = ""
-    searchPosition = args.position[0]
-    fileNames = args.file[0].split(",")
-    numResidues = args.numResidues[0]
-
-    #  start timer
-    startTime = time.clock()
-
     
 
-    #  controls print out to console
-    silent = args.q
+if __name__ == "__main__":
+    args = parseArgs()
 
-    makeFile()
-
-    assignSort(args.sort[0])
-
+    # creates directories for output files
     makeFolders()
 
-    getImportantPositions(args.inputValues)
+    # creates the file to hold unfound organisms
+    path = str(os.getcwd()) + "/unfoundOrganisms.txt"
+    if not os.path.exists(path):
+        open(path, "w").close()
 
-    getPosList()
+    # initializes howToSort based on command line input
+    # first value is 0,1 meaning key or value, second is reverse = true or false
+    # [0, False] is the default sort
+    howToSort = [0, False]
+    sort = args.sort[0]
+    if sort == 0:
+        howToSort = [1, False]
+    if sort == 1:
+        howToSort = [1, True]
+    if sort == 2:
+        howToSort = [0, False]
+    if sort == 3:
+        howToSort = [0, True]
 
-    setUpStructure(silent, args.o)
+    importantPositions = getImportantPositions(args.inputValues)
+    pList = [i[0] for i in importantPositions]
 
-    unFoundOrgs(unFound)
+    # start timer
+    startTime = time.clock()
 
-    if not silent:
+    setUpStructure(args.file[0].split(","), args.numResidues[0], args.position[0], pList, importantPositions, howToSort, args.q, args.o)
+
+    if not args.q:
         print("Parser completed in", round(time.clock() - startTime, 2), "seconds")
-
-        
-
-main()
