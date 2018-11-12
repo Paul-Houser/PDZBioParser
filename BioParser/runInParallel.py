@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # handle command line arguments
 def parseArgs():
     parser = argparse.ArgumentParser(
-        description='Run C-terminal decameric sequences on many files simultaneously')
+        description='Run C-terminal decameric sequence processing on many files simultaneously')
 
     parser.add_argument('file', metavar='file', type=str, nargs=1,
                         help='The text file containing latin names of organisms')
