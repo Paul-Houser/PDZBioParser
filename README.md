@@ -5,9 +5,11 @@ You can download fasta files from [here.](http://www.uniprot.org/proteomes)
 
 ## Requirements
 python 3
+
 requests
 
 ## Usage
+```
 runInParallel.py [-h] [-c] 
                  file positions numResidues inputValues
                  [inputValues ...]
@@ -29,7 +31,7 @@ Optional arguments:
                     CSV for each position of interest supplied.
 
 Example usage:
-```
+
 python3 organisms.txt 1,2,3 6 P0:ILVF P2:ST -c
 ```
 
