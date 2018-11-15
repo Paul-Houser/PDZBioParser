@@ -29,13 +29,6 @@ def parseArgs():
                         help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
     return parser.parse_args()
 
-#  creates necessary folders to put downloads, csv's, and combined data in.
-def makeFolders():
-    folders = ["csv", "fastas", "combinedCSVs", "sequenceLists"]
-    for folder in folders:
-        file_path = str(os.getcwd().replace("\\", "/")) + ("/%s" % folder)
-        if not os.path.exists(file_path):
-            os.makedirs(file_path)
 
 #  gets all important positions from args.inputValues and adds them to the list 'importantPositions'
 def getImportantPositions(inputValues):
@@ -90,9 +83,6 @@ def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPosit
 
 if __name__ == "__main__":
     args = parseArgs()
-
-    # creates directories for output files
-    makeFolders()
 
     # creates the file to hold unfound organisms
     path = str(os.getcwd()) + "/unfoundOrganisms.txt"

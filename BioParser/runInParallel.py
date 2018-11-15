@@ -41,6 +41,14 @@ def parsePositions():
         positions.append(int(string[-1]))
     return list(set(positions))
 
+#  creates necessary folders to put downloads, csv's, and combined data in.
+def makeFolders():
+    folders = ["csv", "fastas", "combinedCSVs", "sequenceLists"]
+    for folder in folders:
+        file_path = str(os.getcwd().replace("\\", "/")) + ("/%s" % folder)
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
+
 # parses input to setup files to call parse.py with
 def parseFileNames(file):
     fileNames = []
@@ -72,10 +80,11 @@ def distributeWork(positions, fileNames):
         #     pass
 
 if __name__ == "__main__":
+    start = time.clock()
+
+    makeFolders()
     args = parseArgs()
     organismListFile = args.file[0]
-
-    start = time.clock()
 
     # exit the program if it can't find the specified file
     if not os.path.isfile(organismListFile):

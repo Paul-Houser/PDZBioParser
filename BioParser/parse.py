@@ -16,6 +16,7 @@ currentSequence = "" # the current chunk of amino acids
 currentLabel = ""
 sequenceLabel = ""
 
+
 #  Interpret .fasta file
 def read_file(currentStructure):
     global currentSequence
@@ -114,10 +115,12 @@ def countMatchingPsnl(currentStructure):
         aminoAcid = item[currentStructure.numResidues - currentStructure.searchPosition - 1]
         currentStructure.freqPositional[aminoAcid] += 1
 
+
 def countLastN(currentStructure):
     for item in set(sequences):
         for i in range(0, len(item)):
             currentStructure.freqLastN[item[i]] += 1
+
 
 def findEnrichment(currentStructure):
     for k in currentStructure.freqAll:
