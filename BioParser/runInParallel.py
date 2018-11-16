@@ -1,3 +1,8 @@
+'''
+runInParallel
+python runInParallel.py -organisms all.txt -positions 1,3,4,5 -numResidues 6 -inputValues P0:ILVF P2:ST -heatmaps -motifID motif1
+'''
+
 import os
 import time
 import argparse
@@ -9,27 +14,28 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 def parseArgs():
     parser = argparse.ArgumentParser(
         description='Run C-terminal decameric sequence processing on many files simultaneously')
-
-    parser.add_argument('file', metavar='file', type=str, nargs=1,
-                        help='The text file containing latin names of organisms')
-    parser.add_argument('positions', metavar='positions', type=str,
-                        nargs=1, help='The positions to search in')
-    parser.add_argument('numResidues', metavar='numResidues', type=int,
-                        nargs=1, help='The number of residues to provide statistics on.')
+    parser.add_argument('-organisms', required=True, type=str, 
+        help='The text file containing latin names of organisms. Usage: all.txt')
+    parser.add_argument('-positions', required=True, type=str, 
+        help='The positions to search over, delimited with commas. Usage: 1,3,4,5')
+    parser.add_argument('-numResidues', required=True, type=int, 
+        help='The number of residues to provide statistics on. Usage: 6')
     parser.add_argument('-inputValues', nargs='+',
-                        help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
-    parser.add_argument('-c', action='store_true',
-                        help='Add this flag to create combined CSVs.')
-    parser.add_argument('-m', action='store_true',
-                        help='Add this flag to make heatmaps for csv data')
-    parser.add_argument('-motifName', type=str, nargs=1, default="motif",
-                        help="Example: 'motif1'")
+        help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
+    parser.add_argument('-c', action='store_true', default=False,
+        help='Add this flag to create combined CSVs.')
+    parser.add_argument('-heatmaps', action='store_true', default=False,
+        help='Add this flag to make enrichment heat maps for csv data.')
+    parser.add_argument('-motifID', type=str, default="motif",
+        help="If heatmaps are created, use this naming convention. Usage: motif1")
     return parser.parse_args()
 
+'''
+#RC NOTE: replaced with args.positions.split(',')
 # parses input to setup positions array
 def parsePositions():
     positions = []
-    string = args.positions[0]
+    string = args.positions
     stream = ""
 
     # for each character in the input, if it's a digit, concatenate to number
@@ -44,6 +50,7 @@ def parsePositions():
     if (string[-1].isdigit()):
         positions.append(int(string[-1]))
     return list(set(positions))
+'''
 
 #  creates necessary folders to put downloads, csv's, and combined data in.
 def makeFolders():
@@ -77,22 +84,41 @@ def distributeWork(positions, fileNames, args):
         for x in positions:
             for i in fileNames:
                 # submit tasks to be completed by threads
-                # print(sys.executable + " main.py " + i + " " + str(x) + " " + str(args.numResidues[0]) + " 2 -o -q " + callString)
-                futures.append(executor.submit(os.system, (sys.executable + " main.py " + i + " " + str(x) + " " + str(args.numResidues[0]) + " 2 -o -q " + callString)))
+                # print(sys.executable + " main.py " + i + " " + str(x) + " " + str(args.numResidues) + " 2 -o -q " + callString)
+                futures.append(executor.submit(os.system, (sys.executable + " main.py " + i + " " + str(x) + " " + str(args.numResidues) + " 2 -o -q " + callString)))
         # progress bar
         # for f in tqdm(as_completed(futures), ncols=100, unit="%", total=(len(fileNames) * len(positions))):
         #     pass
 
+"""
+createHeatmaps
+for each position provided, extract enrichments from the csv files and create heat map pngs for each position.
+
+organisms (list) -- organisms extracted from provided file
+motifID (str)    -- identifier for current motif
+positions (list) -- positions to create heat maps of
+"""
+def createHeatmaps(organisms, motifID, positions):
+    for p in positions:
+        infiles = 'csv/*' + p + '.csv'
+        pickle = motifID + '/' + 'position' + p + '.p'
+        title = motifID + '_position' + p
+        outfile = motifID + '/' + title + '.png'
+
+        os.system("python extractCSV.py --files '" + infiles + "' -outfile " + pickle)
+        os.system('python createHeatMap.py --enrichment ' + pickle + ' --out ' + outfile 
+        + ' -title ' + title + ' -organisms ' + organisms)
+
 if __name__ == "__main__":
+    args = parseArgs()
     start = time.clock()
+    positions = args.positions.split(',')
 
     makeFolders()
-    args = parseArgs()
-    organismListFile = args.file[0]
 
     # exit the program if it can't find the specified file
-    if not os.path.isfile(organismListFile):
-        print("Could not find file " + organismListFile + " to read.")
+    if not os.path.isfile(args.organisms):
+        print("Could not find file " + args.organisms + " to read.")
         exit(1)
 
     #  creates file for unfound organisms
@@ -100,14 +126,18 @@ if __name__ == "__main__":
     f.write("Organisms not found on uniprot:\n\n")
     f.close()
 
-    distributeWork(parsePositions(), parseFileNames(args.file[0]), args)
+    distributeWork(positions, parseFileNames(args.organisms), args)
 
-    if args.m:
-        os.system("python extractCSV.py 'csv/*.csv' ")
+    # if the user supplies -heatmap flag, create heatmaps for each position provided
+    if args.heatmaps:
+        print("Creating heat maps...")
+        if not os.path.exists(args.motifID):
+            os.makedirs(args.motifID)
+        createHeatmaps(args.organisms, args.motifID, positions)
 
     # if the user supplies -c flag, combine CSVs with combineData.py
     if args.c:
         print("Combining CSVs...")
-        os.system(sys.executable + " combineData.py " + str(args.file[0]) + " " + str(args.positions[0]))
+        os.system(sys.executable + " combineData.py " + str(args.organisms) + " " + str(args.positions))
 
     print('All tasks completed in ' + str(round(time.clock() - start, 2)) + " seconds")
