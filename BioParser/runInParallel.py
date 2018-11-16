@@ -16,10 +16,14 @@ def parseArgs():
                         nargs=1, help='The positions to search in')
     parser.add_argument('numResidues', metavar='numResidues', type=int,
                         nargs=1, help='The number of residues to provide statistics on.')
-    parser.add_argument('inputValues', nargs='+',
+    parser.add_argument('-inputValues', nargs='+',
                         help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
     parser.add_argument('-c', action='store_true',
                         help='Add this flag to create combined CSVs.')
+    parser.add_argument('-m', action='store_true',
+                        help='Add this flag to make heatmaps for csv data')
+    parser.add_argument('-motifName', type=str, nargs=1, default="motif",
+                        help="Example: 'motif1'")
     return parser.parse_args()
 
 # parses input to setup positions array
@@ -60,7 +64,7 @@ def parseFileNames(file):
             fileNames.append(file)
     return fileNames
 
-def distributeWork(positions, fileNames):
+def distributeWork(positions, fileNames, args):
     callString = ""
     for i in args.inputValues:
         callString += i + " "
@@ -96,10 +100,13 @@ if __name__ == "__main__":
     f.write("Organisms not found on uniprot:\n\n")
     f.close()
 
-    distributeWork(parsePositions(), parseFileNames(args.file[0]))
+    distributeWork(parsePositions(), parseFileNames(args.file[0]), args)
+
+    if args.m:
+        os.system("python extractCSV.py 'csv/*.csv' ")
 
     # if the user supplies -c flag, combine CSVs with combineData.py
-    if args.c:  
+    if args.c:
         print("Combining CSVs...")
         os.system(sys.executable + " combineData.py " + str(args.file[0]) + " " + str(args.positions[0]))
 
