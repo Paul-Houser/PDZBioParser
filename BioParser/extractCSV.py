@@ -25,7 +25,7 @@ import csv
 import pickle
 
 # Mapping the long CSV category names to shorter names for dictionary references
-filelists = {"Frequencies of all amino acids in the last 6 positions (non-redundant):":'last_f', "Enrichment ratios for each amino acid at given position":'pos_e', "Frequencies of all amino acids at the given position (non-redundant)":'pos_f', "Frequencies of all amino acids in file:":'all_f'}
+filelists = {"Frequencies of all amino acids in the last 6 positions (non-redundant):":'last_f', "Enrichment ratios for each amino acid at given position":'pos_e', "Frequencies of all amino acids at the given position (non-redundant)":'pos_f', "Frequencies of all amino acids at search position:":'all_f'}
 
 # Mapping the value type to the category names (pos_e does not contain the Percentage category)
 enrichment = ["# Occurrences"]
