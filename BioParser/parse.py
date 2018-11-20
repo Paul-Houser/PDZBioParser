@@ -84,8 +84,9 @@ def processSequence(currentStructure):
     global sequences
     global matchingSequences
     
-    for char in currentSequence:
-        currentStructure.freqAll[char] += 1
+    # char is set to the amino acid that occurs at the searchPosition of the current sequence
+    char = currentSequence[currentStructure.numResidues - currentStructure.searchPosition - 1]
+    currentStructure.freqAllPsnl[char] += 1
     
     # sets currentSequence to equal the last numResidues of itself
     currentSequence = currentSequence[-currentStructure.numResidues:] 
@@ -123,10 +124,10 @@ def countLastN(currentStructure):
 
 
 def findEnrichment(currentStructure):
-    for k in currentStructure.freqAll:
-        acidFreqAll = currentStructure.freqAll[k]
+    for k in currentStructure.freqAllPsnl:
+        acidFreqAll = currentStructure.freqAllPsnl[k]
         acidFreqPos = currentStructure.freqPositional[k]
-        sumFreqAll = sum(currentStructure.freqAll.values())
+        sumFreqAll = sum(currentStructure.freqAllPsnl.values())
         sumFreqPos = sum(currentStructure.freqPositional.values())
 
         if acidFreqAll != 0 and sumFreqAll != 0 and sumFreqPos != 0:
