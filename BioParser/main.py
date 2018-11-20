@@ -69,8 +69,8 @@ def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPosit
 
         # file writing
         setupOutputFile(currentStructure)
-        printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids in file:",
-                currentStructure.freqAll, True, searchPosition, False, silent)
+        printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at search position:",
+                currentStructure.freqAllPsnl, True, searchPosition, False, silent)
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids in the last " + str(
             currentStructure.numResidues) + " positions (non-redundant):", currentStructure.freqLastN, True, searchPosition, False, silent)
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at the given position (non-redundant)",
