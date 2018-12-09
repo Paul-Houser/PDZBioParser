@@ -53,7 +53,7 @@ def parsePositions():
 
 #  creates necessary folders to put downloads, csv's, and combined data in.
 def makeFolders():
-    folders = ["csv", "fastas", "combinedCSVs", "sequenceLists"]
+    folders = ["csv", "fastas", "combinedCSVs", "sequenceLists","rawTSV"]
     for folder in folders:
         file_path = str(os.getcwd().replace("\\", "/")) + ("/%s" % folder)
         if not os.path.exists(file_path):

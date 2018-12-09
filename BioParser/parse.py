@@ -7,11 +7,14 @@ from dl import getFasta
 from structure import structure
 import time
 import os
+from  fileOutput import generateRawTSVFiles 
 #  Interpret .fasta file
 def read_file(currentStructure):
     #  returns false if the .fasta cannot be found.
     #  In main.py, if read_file returns false, the organism is added to an unfound organisms list.
+    
     organismName = getFasta(currentStructure.organism, True)
+    print(organismName)
     if not organismName:
         return False
     currentStructure.organism = organismName
@@ -39,6 +42,8 @@ def read_file(currentStructure):
                 sequence = x[1].replace('\n','')
                 proteins.append([x[0],sequence])
                 proteinsLastN.append([x[0],sequence[-currentStructure.numResidues:]])
+        if not os.path.isfile(currentStructure.organism.split(".")[0] + ".tsv"):
+            generateRawTSVFiles(currentStructure.organism,proteinsLastN)
         motifMatchingProteins = [[i[0],i[1]]  for i in proteinsLastN if all([i[1][-(1+currentStructure.pList[k])] in currentStructure.importantPositions[k] for k in range(len(currentStructure.pList))]) ]
         processFile(proteinsLastN,motifMatchingProteins,currentStructure)
         findEnrichment(currentStructure)
