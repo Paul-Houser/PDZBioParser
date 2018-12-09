@@ -37,7 +37,6 @@ def parsePositions():
     positions = []
     string = args.positions
     stream = ""
-
     # for each character in the input, if it's a digit, concatenate to number
     # otherwise the number is done being read, add to positions
     for i in range(0, len(string)):
@@ -63,12 +62,30 @@ def makeFolders():
 # parses input to setup files to call parse.py with
 def parseFileNames(file):
     fileNames = []
+    
     with open(file, "r") as f:
         lines = f.readlines()
         for line in lines:
-            file = line.replace(" ", "_")
-            file = file.strip("\n") + ".fasta"
-            fileNames.append(file)
+            fileName = {'fileName':False,'taxonId':False,'R':False}
+            orgName = []
+            words = line.split()
+            words = list(filter(None,words))
+            print(words)
+            for word in words:
+                if word.isdigit():
+                    fileName['taxonId'] = word
+                elif word.lower() in set(['no','yes']):
+                    fileName['R'] = word.lower()
+                else:
+                    
+                    orgName.append(word)
+            if not  fileName["R"]:
+                fileName["R"] = 'no'
+            if not fileName['taxonId']:
+                fileName['taxonId'] = "temp"
+            fileName["fileName"] = "_".join(orgName).replace('\n','')+'_'+"TaxID"+"_"+fileName["taxonId"]+"_"+"R_"+fileName["R"]+".fasta"
+           
+            fileNames.append(fileName["fileName"])
     return fileNames
 
 def distributeWork(positions, fileNames, args):
@@ -83,6 +100,7 @@ def distributeWork(positions, fileNames, args):
     with ThreadPoolExecutor(max_workers=8) as executor:
         for x in positions:
             for i in fileNames:
+                
                 # submit tasks to be completed by threads
                 # print(sys.executable + " main.py " + i + " " + str(x) + " " + str(args.numResidues) + " 2 -o -q " + callString)
                 futures.append(executor.submit(os.system, (sys.executable + " main.py " + i + " " + str(x) + " " + str(args.numResidues) + " 2 -o -q " + callString)))
@@ -93,7 +111,6 @@ def distributeWork(positions, fileNames, args):
 """
 createHeatmaps
 for each position provided, extract enrichments from the csv files and create heat map pngs for each position.
-
 organisms (list) -- organisms extracted from provided file
 motifID (str)    -- identifier for current motif
 positions (list) -- positions to create heat maps of
@@ -125,9 +142,18 @@ if __name__ == "__main__":
     f = open("unfoundOrganisms.txt", "w")
     f.write("Organisms not found on uniprot:\n\n")
     f.close()
-
+    # initialises temp.file so that other programs can know what the input file was , this is a weird solution come back to this
+    f = open("~temp.file",'w')
+    f.write(args.organisms[:-4]+"_verbose.txt")
+    f.close()
+    open(args.organisms[:-4]+"_verbose.txt",'w').close()
     distributeWork(positions, parseFileNames(args.organisms), args)
-
+    os.remove("~temp.file")
+    with open(args.organisms[:-4]+"_verbose.txt",'r') as f:
+        uniqueLines = set(f.readlines())
+    with open(args.organisms[:-4]+"_verbose.txt",'w') as f:
+        for line in sorted(uniqueLines):
+            f.write(line)
     # if the user supplies -heatmap flag, create heatmaps for each position provided
     if args.heatmaps:
         print("Creating heat maps...")

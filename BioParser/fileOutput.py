@@ -35,7 +35,7 @@ def printSequencesAndIdentifiers(structure):
     f = open(writeFile.split(".")[0] + ".tsv", 'w')
     f.write("Sequence:\tIdentifier:\n")
     for i in range(0, len(structure.sequences)):
-        f.write(structure.sequences[i] + "\t" + structure.sequenceLabels[i])
+        f.write(structure.sequences[i] + "\t" + structure.sequenceLabels[i]+'\n')
     f.close()
 
 #  print data from one dictionary into console and file
