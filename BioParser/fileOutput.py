@@ -28,14 +28,20 @@ def setupOutputFile(structure):
     f.close()
 
 # create csv of sequences with identifiers
-
+def generateRawTSVFiles(fileName,proteinsLastN):
+    writeFile = "rawTSV/" + fileName.split(".")[0]
+    f = open(writeFile.split(".")[0] + ".tsv", 'w')
+    f.write("Sequence:\tIdentifier:\n")
+    for i in range(0, len(proteinsLastN)):
+        f.write(proteinsLastN[i][0] + "\t" + proteinsLastN[i][1]+'\n')
+    f.close()
 
 def printSequencesAndIdentifiers(structure):
     writeFile = "sequenceLists/" + structure.organism.split(".")[0]
     f = open(writeFile.split(".")[0] + ".tsv", 'w')
     f.write("Sequence:\tIdentifier:\n")
     for i in range(0, len(structure.sequences)):
-        f.write(structure.sequences[i] + "\t" + structure.sequenceLabels[i])
+        f.write(structure.sequences[i] + "\t" + structure.sequenceLabels[i]+'\n')
     f.close()
 
 #  print data from one dictionary into console and file

@@ -1,134 +1,84 @@
 #  bioParser
-#  Milo Rupp, Raiden van Bronkhorst, Paul Houser
-#  10/12/17
+#  Jordan Valgardson,Milo Rupp, Raiden van Bronkhorst, Paul Houser
+#  12/8/2018
 
 #  import dependencies
 from dl import getFasta
 from structure import structure
-
-#  matchingSequences holds the last numResidues residues from each sequence that match the given motif
-matchingSequences = []
-
-#  sequences holds the last numResidues residues of every sequence
-sequences = []
-
-currentSequence = "" # the current chunk of amino acids
-currentLabel = ""
-sequenceLabel = ""
-
-
+import time
+import os
+from  fileOutput import generateRawTSVFiles 
 #  Interpret .fasta file
 def read_file(currentStructure):
-    global currentSequence
-
     #  returns false if the .fasta cannot be found.
     #  In main.py, if read_file returns false, the organism is added to an unfound organisms list.
-    if not getFasta(currentStructure.organism, True):
-        return False
     
+    organismName = getFasta(currentStructure.organism, True)
+    print(organismName)
+    if not organismName:
+        return False
+    currentStructure.organism = organismName
     #  makes filename from organism name
     orgName = currentStructure.organism
+    with open("~temp.file",'r') as f:
+       with open(f.read(),'a') as f2:
+           f2.write(" ".join([i for i in orgName.split('.')[0].split('_') if not i in set(['TaxID','R'])])+'\n')
+       
+   
+   
     fileName = "fastas/" + orgName
-
+    
     #  opens .fasta file to be parsed
     with open(fileName, "r") as file:
 
-        lines = file.readlines()
-        lines.append(">")
-
-        for line in lines:
-            
-            # a '>' signifies the start of a new protein in the fasta files
-            if line[0] == ">":
-                newProtein(line, currentStructure)
-            else:
-                #  strips out linebreaks from sequence and add them to currentSequence
-                currentSequence += line.strip("\n")
-    
-    # adds the motif-matching sequences to currentStructure (redundancy NOT removed)
-    addMatching(currentStructure)
-
-    # counts frequency positional of just matching sequences and adds them to currentStructure (redundancy removed)
-    countMatchingPsnl(currentStructure)
-
-    # counts frequency in last N residues and adds them to currentStructure (redundancy removed)
-    countLastN(currentStructure)
-
-    # finds enrichment values for each position and adds them to currentStructure
-    findEnrichment(currentStructure)
-
+        lines = file.read()
+        #generate a list of all proteins and headers,structure: [[header,protein],etc]
+       
+        proteins = []
+        proteinsLastN = []
+        for i in lines.split('\n>'):
+            x = i.split('\n',1)
+            if len(x[1])>currentStructure.numResidues:
+                sequence = x[1].replace('\n','')
+                proteins.append([x[0],sequence])
+                proteinsLastN.append([x[0],sequence[-currentStructure.numResidues:]])
+        if not os.path.isfile(currentStructure.organism.split(".")[0] + ".tsv"):
+            generateRawTSVFiles(currentStructure.organism,proteinsLastN)
+        motifMatchingProteins = [[i[0],i[1]]  for i in proteinsLastN if all([i[1][-(1+currentStructure.pList[k])] in currentStructure.importantPositions[k] for k in range(len(currentStructure.pList))]) ]
+        processFile(proteinsLastN,motifMatchingProteins,currentStructure)
+        findEnrichment(currentStructure)
+        return currentStructure
+def processFile(proteinsLastN,motifMatchingProteins,currentStructure):
+    for protein in proteinsLastN:
+        char =  protein[1][-(1+currentStructure.searchPosition)]
+        currentStructure.freqAllPositional[char] += 1
+    for protein in motifMatchingProteins:
+        char =  protein [1][-currentStructure.searchPosition]
+        currentStructure.freqMotifPositional[char] += 1 #check to make sure this is right place to store this information
+    for protein in list(zip(*proteinsLastN))[1]:
+        char = protein[-currentStructure.searchPosition]
+        currentStructure.freqnonRedAllPositional[char] += 1
+    LabelAndSequences = list(zip(*motifMatchingProteins)) # transpose the motifMatchingProteins list
+    try:
+        for protein in LabelAndSequences[1]:
+            char = protein[-currentStructure.searchPosition]
+            currentStructure.freqnonRedAllPositional[char] += 1
+    except:
+        print(LabelAndSequences)
+        print(motifMatchingProteins)
+    currentStructure.sequences = LabelAndSequences[1]
+    currentStructure.sequenceLabels = LabelAndSequences[0]
     return currentStructure
-
-
-# set up variables for starting a new protein
-def newProtein(line, currentStructure):
-    #  This function modifies the global variables sequenceLabel, currentLabel, and currentSequence
-    global sequenceLabel
-    global currentLabel
-    global currentSequence
-
-    sequenceLabel = currentLabel
-    currentLabel = line
-
-    # if currentSequence != an empty string, then a full sequence has been found and can be processed
-    if currentSequence != "":
-        processSequence(currentStructure)
-    
-    # Reset currentSequence in preparation for the next sequence
-    currentSequence = ""
-
-
-# processesSequence takes a complete sequence and processes it based on the importantPositions list in currentStructure
-def processSequence(currentStructure):
-    global currentSequence
-    global sequences
-    global matchingSequences
-    
-    # char is set to the amino acid that occurs at the searchPosition of the current sequence
-    char = currentSequence[currentStructure.numResidues - currentStructure.searchPosition - 1]
-    currentStructure.freqAllPsnl[char] += 1
-    
-    # sets currentSequence to equal the last numResidues of itself
-    currentSequence = currentSequence[-currentStructure.numResidues:] 
-    sequences.append(currentSequence)
-
-    # Determines if the sequence matches motif in currentStructure.importantPositions
-    shouldAppend = True
-    for i in range(0, len(currentStructure.pList)):
-         if not currentSequence[len(currentSequence) - currentStructure.pList[i] - 1] in currentStructure.importantPositions[i]:
-             shouldAppend = False
-             break
-    
-    # If the sequence matches the motif, append sequence to matchingSequences, and sequenceLabel to
-    # currentStructure.sequenceLabels.
-    if shouldAppend:
-        matchingSequences.append(currentSequence)
-        currentStructure.sequenceLabels.append(sequenceLabel)
-
-
-def addMatching(currentStructure):
-    for item in matchingSequences:
-        currentStructure.sequences.append(item)
-
-
-def countMatchingPsnl(currentStructure):
-    for item in set(matchingSequences): # set removes redundancy
-        aminoAcid = item[currentStructure.numResidues - currentStructure.searchPosition - 1]
-        currentStructure.freqPositional[aminoAcid] += 1
-
-
-def countLastN(currentStructure):
-    for item in set(sequences):
-        for i in range(0, len(item)):
-            currentStructure.freqLastN[item[i]] += 1
-
 
 def findEnrichment(currentStructure):
     for k in currentStructure.freqAllPsnl:
-        acidFreqAll = currentStructure.freqAllPsnl[k]
-        acidFreqPos = currentStructure.freqPositional[k]
-        sumFreqAll = sum(currentStructure.freqAllPsnl.values())
-        sumFreqPos = sum(currentStructure.freqPositional.values())
+        acidFreqAll = currentStructure.freqnonRedAllPositional[k]
+        acidFreqPos = currentStructure.freqnonRedMotifPositional[k]
+        sumFreqAll = sum(currentStructure.freqnonRedAllPositional.values())
+        sumFreqPos = sum(currentStructure.freqnonRedMotifPositional.values())
 
         if acidFreqAll != 0 and sumFreqAll != 0 and sumFreqPos != 0:
             currentStructure.enrichment[k] = round((acidFreqPos / sumFreqPos) / (acidFreqAll / sumFreqAll), 3)
+    
+    
+
