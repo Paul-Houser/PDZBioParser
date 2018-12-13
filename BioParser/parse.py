@@ -84,13 +84,15 @@ def processSequence(currentStructure):
     global sequences
     global matchingSequences
     
-    # char is set to the amino acid that occurs at the searchPosition of the current sequence
-    char = currentSequence[currentStructure.numResidues - currentStructure.searchPosition - 1]
-    currentStructure.freqAllPsnl[char] += 1
     
     # sets currentSequence to equal the last numResidues of itself
     currentSequence = currentSequence[-currentStructure.numResidues:] 
     sequences.append(currentSequence)
+
+    # char is set to the amino acid that occurs at the searchPosition of the current sequence
+    char = currentSequence[currentStructure.numResidues - currentStructure.searchPosition - 1]
+    currentStructure.freqAllPsnl[char] += 1
+
 
     # Determines if the sequence matches motif in currentStructure.importantPositions
     shouldAppend = True
