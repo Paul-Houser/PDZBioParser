@@ -66,20 +66,21 @@ def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPosit
         if not (currentStructure):
             unFoundOrgs(file.split(".")[0])
             continue
-
+    
+        file = currentStructure.organism
         # file writing
         setupOutputFile(currentStructure)
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at search position:",
-                currentStructure.freqAllPsnl, True, searchPosition, False, silent)
+                currentStructure.freqMotifPositional, True, searchPosition, False, silent)
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids in the last " + str(
             currentStructure.numResidues) + " positions (non-redundant):", currentStructure.freqLastN, True, searchPosition, False, silent)
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at the given position (non-redundant)",
-                currentStructure.freqPositional, True, searchPosition, False, silent)
+                currentStructure.freqAllPositional, True, searchPosition, False, silent)
         printData("csv/" + file.split(".")[0] + ".csv", "Enrichment ratios for each amino acid at given position",
                 currentStructure.enrichment, False, searchPosition, howToSort, silent)
         if (o):
             printSequencesAndIdentifiers(currentStructure)
-    
+        
 
 if __name__ == "__main__":
     args = parseArgs()
