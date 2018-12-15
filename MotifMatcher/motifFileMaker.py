@@ -35,9 +35,11 @@ def motif_Finder(inTSVFolder,motif_type,motifLen,outFile,refOrganism):
         
         # calculates the score for every unique motif in the organism list against the reference organism
         for organism in motifEndings:
-            tempDict = {6:set(),5:set(),4:set(),3:set(),2:set(),1:set()}
+            
+          
+            tempDict = {n:set() for n in range(1,motifLen+1)}
             for motif in motifEndings[organism]:
-                score = sum([1 if motif[i] == Ref_motif[i] else 0 for i in [5,4,3,2,1,0]])
+                score = sum([1 if motif[i] == Ref_motif[i] else 0 for i in  range(motifLen)])
                 if score != 0:
                     tempDict[score].add(motif)
 
