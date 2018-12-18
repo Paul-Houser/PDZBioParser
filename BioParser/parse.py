@@ -65,13 +65,11 @@ def processFile(proteinsLastN,motifMatchingProteins,currentStructure):
         currentStructure.freqnonRedAllPositional[char] += 1
     LabelAndSequences = list(zip(*motifMatchingProteins)) # transpose the motifMatchingProteins list
     # record the freq of each amino acid for all the motif matching non redundant proteins
-    try:
-        for protein in set(LabelAndSequences[1]):
-            char = protein[-currentStructure.searchPosition]
-            currentStructure.freqnonRedAllPositional[char] += 1
-    except:
-        print(LabelAndSequences)
-        print(motifMatchingProteins)
+    
+    for protein in set(LabelAndSequences[1]):
+        char = protein[-currentStructure.searchPosition]
+        currentStructure.freqnonRedAllPositional[char] += 1
+   
     # save the redundant motif information to the current Structure
     currentStructure.sequences = LabelAndSequences[1]
     currentStructure.sequenceLabels = LabelAndSequences[0]
