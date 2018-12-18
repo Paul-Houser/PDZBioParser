@@ -70,7 +70,7 @@ def parseFileNames(file):
             orgName = []
             words = line.split()
             words = list(filter(None,words))
-            print(words)
+        
             for word in words:
                 if word.isdigit():
                     fileName['taxonId'] = word

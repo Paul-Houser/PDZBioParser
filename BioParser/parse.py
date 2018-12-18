@@ -14,7 +14,7 @@ def read_file(currentStructure):
     #  In main.py, if read_file returns false, the organism is added to an unfound organisms list.
     
     organismName = getFasta(currentStructure.organism, True)
-    print(organismName)
+    
     if not organismName:
         return False
     currentStructure.organism = organismName
@@ -57,17 +57,17 @@ def processFile(proteinsLastN,motifMatchingProteins,currentStructure):
         char =  protein[1][-(1+currentStructure.searchPosition)]
         currentStructure.freqAllPositional[char] += 1
     for protein in motifMatchingProteins:
-        char =  protein [1][-currentStructure.searchPosition]
+        char =  protein [1][-(1+currentStructure.searchPosition)]
         currentStructure.freqMotifPositional[char] += 1
     # record the freq of each amino acid for all the non redundant proteins
     for protein in set(list(zip(*proteinsLastN))[1]):
-        char = protein[-currentStructure.searchPosition]
+        char = protein[-(1+currentStructure.searchPosition)]
         currentStructure.freqnonRedAllPositional[char] += 1
     LabelAndSequences = list(zip(*motifMatchingProteins)) # transpose the motifMatchingProteins list
     # record the freq of each amino acid for all the motif matching non redundant proteins
     
     for protein in set(LabelAndSequences[1]):
-        char = protein[-currentStructure.searchPosition]
+        char = protein[-(1+currentStructure.searchPosition)]
         currentStructure.freqnonRedAllPositional[char] += 1
    
     # save the redundant motif information to the current Structure
