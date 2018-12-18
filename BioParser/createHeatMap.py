@@ -32,7 +32,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1 import AxesGrid
 from matplotlib import cm
 import matplotlib.pyplot as plt
-
+#from GenerateFileList import parseFileNames
 #negative charge, positive charge, aromatic, aliphatic, polar, other
 aminoacids = [["D", "E"],["H", "K", "R"],["F", "W", "Y"],["A", "I", "L", "V"],["N", "Q", "S", "T"],["G", "P", "M", "C"]]
 
