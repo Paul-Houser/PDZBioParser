@@ -12,12 +12,13 @@ def motif_Finder(inTSVFolder,motif_type,motifLen,outFile,refOrganism):
     refEndings = set()
     # gets all of the unique protein endings for each organism in the tsv folder saves them to a dictionary
     for file in os.listdir(inTSVFolder):
-        readFile = open(inTSVFolder + file, 'r')
-        allEndings[file] = set()
-        for line in readFile:
-            tempSequence = line.split('\t')[1].replace('\n','')
-            if len(tempSequence) == motifLen:
-                allEndings[file].add(tempSequence)
+        with open(inTSVFolder + file, 'r') as readFile:
+            allEndings[file] = set()
+            
+            for line in readFile:
+                tempSequence = line.split('\t')[1].replace('\n','')
+                if len(tempSequence) == motifLen:
+                    allEndings[file].add(tempSequence)
     # checks if the protein endings fufill the motif criteria
     for organism in allEndings:  
         motifEndings[organism] = set()
@@ -25,13 +26,18 @@ def motif_Finder(inTSVFolder,motif_type,motifLen,outFile,refOrganism):
            
             if all(motif[key] in motif_type[key] for key in motif_type):
                  motifEndings[organism].add(motif)
+
+            
     # removes the reference organism from the rest of the organisms
     refEndings = refEndings | motifEndings[refOrganism]
     del motifEndings[refOrganism]
     #initializes the xml tree output
     root = etree.Element("root")
+  
+    summary =  etree.SubElement(root, "Summary",name = refOrganism+","+str(len(refEndings))+";" +";".join([",".join([key,str(len(value))]) for key, value in motifEndings.items()]))
+   
     for Ref_motif in refEndings:
-        refEnding  = etree.SubElement(root, "RefSequence",name = Ref_motif)
+        refEnding  = etree.SubElement(summary, "RefSequence",name = Ref_motif)
         
         # calculates the score for every unique motif in the organism list against the reference organism
         for organism in motifEndings:

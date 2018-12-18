@@ -18,17 +18,20 @@ def parseArgs():
                         help='The number of residues to provide statistics on. Usage: 6')
     parser.add_argument('-inputValues', required=True,nargs='+',
                         help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
+    parser.add_argument('-out', required=True, type=str,
+                        help='out put file directory')
+    parser.add_argument('-significance', required=True, type=float,
+                        help='significance cut off value example 0.95 corresponds to P<0.05 or 5% chance the item was flagged in error')
     return parser.parse_args()
 if __name__ == "__main__":
     args = parseArgs()
-    print(args)
     start = time.clock()
-    folderName = os.path.basename(os.path.normpath(args.sequenceFolder))
-    print(args.inputValues)
+    folderName = os.path.normpath(args.sequenceFolder)
     motifName ='-'.join(args.inputValues).replace(':','_')
     motif = {(5-int(k[0])):set(list(k[1])) for k in[i.replace('P','').split(':') for i in args.inputValues]}
-    xmlFileName = folderName + "_"+motifName+".xml"
-    tsvFileName = folderName + "_"+motifName+".tsv"
+    xmlFileName = args.out +".xml"
+    tsvFileName = args.out +".tsv"
     motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
-    motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName)
+    motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
+    print("completed in: " +str(time.clock()-start))
     
