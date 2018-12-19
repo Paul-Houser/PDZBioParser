@@ -94,10 +94,9 @@ def createHeatmaps(organisms, motifID, positions):
         pickle = motifID + '/' + 'position' + p + '.p'
         title = motifID + '_position' + p
         outfile = motifID + '/' + title + '.png'
-
-        os.system("python extractCSV.py --files '" + infiles + "' -outfile " + pickle)
-        os.system('python createHeatMap.py --enrichment ' + pickle + ' --out ' + outfile 
-        + ' -title ' + title + ' -organisms ' + organisms)
+        os.system(sys.executable + " extractCSV.py " + "--files '" + infiles + "' -outfile " + pickle)
+        os.system(sys.executable + " createHeatMap.py " + "--enrichment " + pickle + ' --out ' + outfile + ' -title ' + title + ' -organisms ' + organisms)
+        
 
 if __name__ == "__main__":
     args = parseArgs()
