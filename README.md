@@ -42,8 +42,9 @@ python3 runInParallel.py -organisms all_organisms.txt -inputValues P0:WYIAfLVM P
 ```
 
 BEFORE USE: update the file 'organisms_list.txt' to contain the names of all 
-organisms to be parsed, each on their own line. General Structure:
-
+organisms to be parsed, each on their own line. 
+General Structure:
+```
 Name TaxonID Reviewed/Unreviewed
 
 Example.
@@ -51,4 +52,4 @@ bos taurus 9913 no
 caenorhabditis elegans 6239 no
 escherichia coli 83333 yes
 homo sapiens 9606 yes
-
+```
