@@ -4,11 +4,11 @@
 You can download fasta files from [here.](http://www.uniprot.org/proteomes)
 
 ## Requirements
-python 3
-lxml
-requests
-numpy
-matplotlib
+python 3,
+lxml,
+requests,
+numpy,
+matplotlib,
 ## Usage
 ```
 runInParallel.py [-h] -organisms ORGANISMS -positions POSITIONS
