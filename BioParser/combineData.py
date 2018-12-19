@@ -33,7 +33,7 @@ def parsePositions():
 
 parsePositions()
 fileNames = parseFileNames(readFile)
-print(fileNames)
+
 for p in positions:
     combinedFile = open("combinedCSVs/combined" + str(p) + ".csv", "w")
 

@@ -90,11 +90,13 @@ positions (list) -- positions to create heat maps of
 """
 def createHeatmaps(organisms, motifID, positions):
     for p in positions:
-        infiles = 'csv/*' + p + '.csv'
+        infiles = '/csv/*' + p + '.csv'
+
         pickle = motifID + '/' + 'position' + p + '.p'
         title = motifID + '_position' + p
         outfile = motifID + '/' + title + '.png'
-        os.system(sys.executable + " extractCSV.py " + "--files '" + infiles + "' -outfile " + pickle)
+       
+        os.system(sys.executable + " extractCSV.py " + "--files " + infiles + " -outfile " + pickle)
         os.system(sys.executable + " createHeatMap.py " + "--enrichment " + pickle + ' --out ' + outfile + ' -title ' + title + ' -organisms ' + organisms)
         
 
@@ -120,6 +122,7 @@ if __name__ == "__main__":
     f.close()
     open(args.organisms[:-4]+"_verbose.txt",'w').close()
     distributeWork(positions, parseFileNames(args.organisms), args)
+   
     os.remove("~temp.file")
     with open(args.organisms[:-4]+"_verbose.txt",'r') as f:
         uniqueLines = set(f.readlines())

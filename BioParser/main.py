@@ -62,18 +62,22 @@ def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPosit
 
         # parse file
         # if file cannot be found, add to unfound organisms
+        
         currentStructure = read_file(currentStructure)
         if not (currentStructure):
             unFoundOrgs(file.split(".")[0])
             continue
-    
+       
         file = currentStructure.organism
+
+        a = time.time()
         # file writing
         setupOutputFile(currentStructure)
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at search position:",
                 currentStructure.freqMotifPositional, True, searchPosition, False, silent)
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids in the last " + str(
-            currentStructure.numResidues) + " positions (non-redundant):", currentStructure.freqLastN, True, searchPosition, False, silent)
+            currentStructure.numResidues) + " positions (non-redundant):", currentStructure.freqnonRedMotifPositional , True, searchPosition, False, silent)
+        
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at the given position (non-redundant)",
                 currentStructure.freqAllPositional, True, searchPosition, False, silent)
         printData("csv/" + file.split(".")[0] + ".csv", "Enrichment ratios for each amino acid at given position",
@@ -81,7 +85,7 @@ def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPosit
         if (o):
             printSequencesAndIdentifiers(currentStructure)
         
-
+        
 if __name__ == "__main__":
     args = parseArgs()
 
