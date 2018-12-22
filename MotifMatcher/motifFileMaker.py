@@ -32,33 +32,42 @@ def motif_Finder(inTSVFolder,motif_type,motifLen,outFile,refOrganism):
     refEndings = refEndings | motifEndings[refOrganism]
     del motifEndings[refOrganism]
     #initializes the xml tree output
+    
     root = etree.Element("root")
-  
+    counter = 0
     summary =  etree.SubElement(root, "Summary",name = refOrganism+","+str(len(refEndings))+";" +";".join([",".join([key,str(len(value))]) for key, value in motifEndings.items()]))
-   
+    node = etree.SubElement(summary,"node")
+    tree = etree.ElementTree(root)
+    beginingAndEnd = etree.tostring(tree, pretty_print=True)
+    beginingAndEnd = beginingAndEnd.split(b"<node/>")
+    refNum = 0
+    writeFile.write(beginingAndEnd[0])
     for Ref_motif in refEndings:
-        refEnding  = etree.SubElement(summary, "RefSequence",name = Ref_motif)
-        
+        refEnding  = etree.SubElement(node, "RefSequence",name = Ref_motif)
+        refNum += 1
         # calculates the score for every unique motif in the organism list against the reference organism
         for organism in motifEndings:
-            
+            counter += 1
           
             tempDict = {n:set() for n in range(1,motifLen+1)}
             for motif in motifEndings[organism]:
                 score = sum([1 if motif[i] == Ref_motif[i] else 0 for i in  range(motifLen)])
                 if score != 0:
                     tempDict[score].add(motif)
-
-
-
-
             NonRefOrganism = etree.SubElement(refEnding, "NonRefOrganism",name = organism)
             # add to tree
-            for score in range(6,0,-1):
+            for score in range(motifLen,0,-1):
                 matchScore = etree.SubElement(NonRefOrganism, "match"+str(score)).text = ",".join(tempDict[score])
-    tree = etree.ElementTree(root)
+        if counter > 10000:
+            print(refNum)
+            tree = etree.ElementTree(node)
+            writeFile.write(etree.tostring(tree, pretty_print=True).replace(b"<node>",b"").replace(b"</node>",b""))
+            node.clear()
+            counter = 0
+    tree = etree.ElementTree(node)
+    writeFile.write(etree.tostring(tree, pretty_print=True).replace(b"<node>",b"").replace(b"</node>",b""))
     #print tree to file
-    writeFile.write(etree.tostring(tree, pretty_print=True))
+    writeFile.write(beginingAndEnd[1])
     writeFile.close()
     
 

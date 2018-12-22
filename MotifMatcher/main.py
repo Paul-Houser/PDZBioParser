@@ -22,6 +22,8 @@ def parseArgs():
                         help='out put file directory')
     parser.add_argument('-significance', required=True, type=float,
                         help='significance cut off value example 0.95 corresponds to P<0.05 or 5% chance the item was flagged in error')
+    parser.add_argument("-decouple", action='store_true',required = False, default = False,
+                        help = "If a xml file has all ready been generated use  this flag to skip xml generation")
     return parser.parse_args()
 if __name__ == "__main__":
     args = parseArgs()
@@ -31,7 +33,10 @@ if __name__ == "__main__":
     motif = {(5-int(k[0])):set(list(k[1])) for k in[i.replace('P','').split(':') for i in args.inputValues]}
     xmlFileName = args.out +".xml"
     tsvFileName = args.out +".tsv"
-    motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
-    motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
+    if args.decouple:
+        motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
+    else:
+        motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
+        motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
     print("completed in: " +str(time.clock()-start))
     
