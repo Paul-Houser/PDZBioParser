@@ -48,9 +48,11 @@ def read_file(currentStructure):
             generateRawTSVFiles(currentStructure.organism,proteinsLastN)
         # remove the proteins that dont match the given motif
         motifMatchingProteins = [[i[0],i[1]]  for i in proteinsLastN if all([i[1][-(1+currentStructure.pList[k])] in currentStructure.importantPositions[k] for k in range(len(currentStructure.pList))]) ]
-        processFile(proteinsLastN,motifMatchingProteins,currentStructure)
-        currentStructure = findEnrichment(currentStructure)
+        if motifMatchingProteins:
+            processFile(proteinsLastN,motifMatchingProteins,currentStructure)
+            currentStructure = findEnrichment(currentStructure)
         return currentStructure
+
 def processFile(proteinsLastN,motifMatchingProteins,currentStructure):
     # record the freq of each amino acid for all the proteins
     for protein in proteinsLastN:
@@ -63,6 +65,7 @@ def processFile(proteinsLastN,motifMatchingProteins,currentStructure):
     for protein in set(list(zip(*proteinsLastN))[1]):
         char = protein[-(1+currentStructure.searchPosition)]
         currentStructure.freqnonRedAllPositional[char] += 1
+    
     LabelAndSequences = list(zip(*motifMatchingProteins)) # transpose the motifMatchingProteins list
     # record the freq of each amino acid for all the motif matching non redundant proteins
     
