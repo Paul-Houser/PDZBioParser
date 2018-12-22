@@ -1,3 +1,10 @@
+# Paul Houser, Milo Rupp, Raiden van Bronkhorst, Jordan Valgardson
+
+# September, 2017
+
+# This program sets up variables and the structure object specific to the protein being parsed, and
+# then calls parse.py on the current organism.
+
 #  import dependencies
 import argparse
 import datetime
@@ -25,15 +32,15 @@ def parseArgs():
                         help='Add this flag to enable file output.')
     parser.add_argument('-q', action='store_true',
                         help='Add this flag to silence printout of ratios')
-    parser.add_argument('inputValues', nargs='+',
+    parser.add_argument('motifs', nargs='+',
                         help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
     return parser.parse_args()
 
 
-#  gets all important positions from args.inputValues and adds them to the list 'importantPositions'
-def getImportantPositions(inputValues):
+#  gets all important positions from args.motifs and adds them to the list 'importantPositions'
+def getImportantPositions(motifs):
     importantPositions = []
-    for i in inputValues:
+    for i in motifs:
         currentValue = []
         currentPosition = ""
 
@@ -108,7 +115,7 @@ if __name__ == "__main__":
     if sort == 3:
         howToSort = [0, True]
 
-    importantPositions = getImportantPositions(args.inputValues)
+    importantPositions = getImportantPositions(args.motifs)
     pList = []
     for i in importantPositions:
         pList.append(i[0])

@@ -1,6 +1,13 @@
+# Paul Houser, Milo Rupp, Raiden van Bronkhorst, Jordan Valgardson
+
+# 12/21/2018
+
+# This program parses the arguments necessary for proteome processing, and sets up necessary
+# folders, variables, and runs each proteome to be parsed in it's own thread.
+
 '''
 runInParallel
-python runInParallel.py -organisms all.txt -positions 1,3,4,5 -numResidues 6 -inputValues P0:ILVF P2:ST -heatmaps -motifID motif1
+python runInParallel.py -organisms all.txt -positions 1,3,4,5 -numResidues 6 -motifs P0:ILVF P2:ST -heatmaps -motifID motif1
 '''
 
 import os
@@ -21,7 +28,7 @@ def parseArgs():
         help='The positions to search over, delimited with commas. Usage: 1,3,4,5')
     parser.add_argument('-numResidues', required=True, type=int, 
         help='The number of residues to provide statistics on. Usage: 6')
-    parser.add_argument('-inputValues', nargs='+',
+    parser.add_argument('-motifs', nargs='+',
         help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
     parser.add_argument('-c', action='store_true', default=False,
         help='Add this flag to create combined CSVs.')
@@ -63,7 +70,7 @@ def makeFolders():
 
 def distributeWork(positions, fileNames, args):
     callString = ""
-    for i in args.inputValues:
+    for i in args.motifs:
         callString += i + " "
 
     # array of tasks to be completed
@@ -116,19 +123,23 @@ if __name__ == "__main__":
     f = open("unfoundOrganisms.txt", "w")
     f.write("Organisms not found on uniprot:\n\n")
     f.close()
+
     # initialises temp.file so that other programs can know what the input file was , this is a weird solution come back to this
     f = open("~temp.file",'w')
     f.write(args.organisms[:-4]+"_verbose.txt")
     f.close()
+
     open(args.organisms[:-4]+"_verbose.txt",'w').close()
     distributeWork(positions, parseFileNames(args.organisms), args)
    
     os.remove("~temp.file")
     with open(args.organisms[:-4]+"_verbose.txt",'r') as f:
         uniqueLines = set(f.readlines())
+
     with open(args.organisms[:-4]+"_verbose.txt",'w') as f:
         for line in sorted(uniqueLines):
             f.write(line)
+
     # if the user supplies -heatmap flag, create heatmaps for each position provided
     if args.heatmaps:
         print("Creating heat maps...")

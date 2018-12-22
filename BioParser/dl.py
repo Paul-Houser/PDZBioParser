@@ -1,3 +1,9 @@
+# Milo Rupp, Raiden van Bronkhorst
+
+# November, 2017
+
+# This program uses Uniprot to download the requested organism proteoms, and saves them in the fasta folder.
+
 import requests
 import os
 from structure import structure

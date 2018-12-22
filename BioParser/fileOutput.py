@@ -1,3 +1,10 @@
+# Paul Houser, Milo Rupp, Raiden van Bronkhorst
+
+# November, 2017
+
+# fileOutput is a collection of methods related to the format and output of the data retrieved from
+# parsing the proteomes.
+
 import os
 import datetime
 

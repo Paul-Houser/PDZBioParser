@@ -1,3 +1,7 @@
+# Raiden van Bronkhorst, Milo Rupp
+
+# November, 2017
+
 import os, argparse
 from GenerateFileList import parseFileNames
 # from tqdm import tqdm

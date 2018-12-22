@@ -1,6 +1,13 @@
 #  bioParser
-#  Jordan Valgardson,Milo Rupp, Raiden van Bronkhorst, Paul Houser
+
+#  Jordan Valgardson, Milo Rupp, Raiden van Bronkhorst, Paul Houser
+
 #  12/8/2018
+
+# This program is the analytical part of PDZBioParser, it parses throught an organisms proteome and
+# finds proteins that match the given motifs. It removes redundancy among the last X numResidues
+# and gets data from that set such as enrichment values and frequencies of amino acids at a
+# specific position.
 
 #  import dependencies
 from dl import getFasta
@@ -8,6 +15,7 @@ from structure import structure
 import time
 import os
 from  fileOutput import generateRawTSVFiles 
+
 #  Interpret .fasta file
 def read_file(currentStructure):
     #  returns false if the .fasta cannot be found.
@@ -23,8 +31,6 @@ def read_file(currentStructure):
     with open("~temp.file",'r') as f:
        with open(f.read(),'a') as f2:
            f2.write(" ".join([i for i in orgName.split('.')[0].split('_') if not i in set(['TaxID','R'])])+'\n')
-       
-   
    
     fileName = "fastas/" + orgName
     
@@ -47,8 +53,9 @@ def read_file(currentStructure):
         if not os.path.isfile("rawTSV/" +currentStructure.organism.split(".")[0] + ".tsv"):
             generateRawTSVFiles(currentStructure.organism,proteinsLastN)
         # remove the proteins that dont match the given motif
-        motifMatchingProteins = [[i[0],i[1]]  for i in proteinsLastN if all([i[1][-(1+currentStructure.pList[k])] in currentStructure.importantPositions[k] for k in range(len(currentStructure.pList))]) ]
-        if motifMatchingProteins:
+        motifMatchingProteins = [[i[0],i[1]]  for i in proteinsLastN if all([i[1][-(1+currentStructure.pList[k])] in currentStructure.importantPositions[k] for k in range(len(currentStructure.pList))])]
+
+        if motifMatchingProteins: # only runs if motifMatchingProteins is not empty to prevent error in processFile().
             processFile(proteinsLastN,motifMatchingProteins,currentStructure)
             currentStructure = findEnrichment(currentStructure)
         return currentStructure
@@ -61,6 +68,7 @@ def processFile(proteinsLastN,motifMatchingProteins,currentStructure):
     for protein in motifMatchingProteins:
         char =  protein [1][-(1+currentStructure.searchPosition)]
         currentStructure.freqMotifPositional[char] += 1
+
     # record the freq of each amino acid for all the non redundant proteins
     for protein in set(list(zip(*proteinsLastN))[1]):
         char = protein[-(1+currentStructure.searchPosition)]
