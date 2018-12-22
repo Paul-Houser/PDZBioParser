@@ -129,7 +129,7 @@ def creatTSV(motifRuningSumAndProteinTotals, outFile,motif, numResidues,signific
     refOrg = organismsTotals[0]
     allComb,chance,radx = getComb(motif,numResidues)
     PValues = list(reversed(getPValue(allComb,chance,radx)))
-    sigRegion = {org:list(reversed(calcExpected(proteinTotals[org], significance, PValues))) for org in proteinTotals}
+    sigRegion = {org:calcExpected(proteinTotals[org], significance, PValues) for org in proteinTotals}
     
     with open(outFile,'w') as proportionTest:
         with open(outFile.split(".")[0]+"ChiSquare.tsv","w") as chiSquareFile:
@@ -165,9 +165,9 @@ def creatTSV(motifRuningSumAndProteinTotals, outFile,motif, numResidues,signific
                     for organism in organismAndMatches:
                         chiSquareFile.write(str(-2*sum([m.log(0.5*max(min(m.erfc(-x/(2**0.5)),m.erfc(x/(2**0.5))),7./3 - 4./3 -1)) for x in calcStanDev(proteinTotals[organism],PValues[:-1] ,organismAndMatches[organism])])))             
                         
-                        proportionTest.write(str(sum([((organismAndMatches[organism][x] -proteinTotals[organism]*PValues[x])**2)/proteinTotals[organism]*PValues[x] for x in range(len(PValues[:-1]))])))
-                        proportionTest.write(str(calcStanDev(proteinTotals[organism],PValues[:-1] ,organismAndMatches[organism]))[1:-1])
-                
+                        #proportionTest.write(str(sum([((organismAndMatches[organism][x] -proteinTotals[organism]*PValues[x])**2)/proteinTotals[organism]*PValues[x] for x in range(len(PValues[:-1]))])))
+                        #proportionTest.write(str(calcStanDev(proteinTotals[organism],PValues[:-1] ,organismAndMatches[organism]))[1:-1])
+                        
                         for matchNum in range(len(organismAndMatches[organism])):
                             
                             if sigRegion[organism][matchNum][0] < organismAndMatches[organism][matchNum]/proteinTotals[organism]:
