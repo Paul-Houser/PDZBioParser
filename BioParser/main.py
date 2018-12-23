@@ -83,7 +83,7 @@ def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPosit
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at search position:",
                 currentStructure.freqMotifPositional, True, searchPosition, False, silent)
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids in the last " + str(
-            currentStructure.numResidues) + " positions (non-redundant):", currentStructure.freqnonRedMotifPositional , True, searchPosition, False, silent)
+            currentStructure.numResidues) + " positions (non-redundant):", currentStructure.freqNonRedMotifPositional , True, searchPosition, False, silent)
         
         printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at the given position (non-redundant)",
                 currentStructure.freqAllPositional, True, searchPosition, False, silent)

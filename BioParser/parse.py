@@ -72,7 +72,7 @@ def processFile(proteinsLastN,motifMatchingProteins,currentStructure):
     # record the freq of each amino acid for all the non redundant proteins
     for protein in set(list(zip(*proteinsLastN))[1]):
         char = protein[-(1+currentStructure.searchPosition)]
-        currentStructure.freqnonRedAllPositional[char] += 1
+        currentStructure.freqNonRedAllPositional[char] += 1
     
     LabelAndSequences = list(zip(*motifMatchingProteins)) # transpose the motifMatchingProteins list
     # record the freq of each amino acid for all the motif matching non redundant proteins
@@ -80,7 +80,7 @@ def processFile(proteinsLastN,motifMatchingProteins,currentStructure):
     for protein in set(LabelAndSequences[1]):
         
         char = protein[-(1+currentStructure.searchPosition)]
-        currentStructure.freqnonRedMotifPositional[char] += 1
+        currentStructure.freqNonRedMotifPositional[char] += 1
    
     # save the redundant motif information to the current Structure
     currentStructure.sequences = LabelAndSequences[1]
@@ -88,11 +88,11 @@ def processFile(proteinsLastN,motifMatchingProteins,currentStructure):
     return currentStructure
 
 def findEnrichment(currentStructure):
-    for k in currentStructure.freqnonRedAllPositional:
-        acidFreqAll = currentStructure.freqnonRedAllPositional[k]
-        acidFreqPos = currentStructure.freqnonRedMotifPositional[k]
-        sumFreqAll = sum(currentStructure.freqnonRedAllPositional.values())
-        sumFreqPos = sum(currentStructure.freqnonRedMotifPositional.values())
+    for k in currentStructure.freqNonRedAllPositional:
+        acidFreqAll = currentStructure.freqNonRedAllPositional[k]
+        acidFreqPos = currentStructure.freqNonRedMotifPositional[k]
+        sumFreqAll = sum(currentStructure.freqNonRedAllPositional.values())
+        sumFreqPos = sum(currentStructure.freqNonRedMotifPositional.values())
       
         if acidFreqAll != 0 and sumFreqAll != 0 and sumFreqPos != 0:
             currentStructure.enrichment[k] = round((acidFreqPos / sumFreqPos) / (acidFreqAll / sumFreqAll),3)
