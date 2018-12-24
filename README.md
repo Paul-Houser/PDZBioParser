@@ -36,7 +36,10 @@ Optional arguments:
   -motifID MOTIFID      If heatmaps are created, use this naming convention.
                         Usage: motif1
 Example usage:
+Linux:
 python3 runInParallel.py -organisms all_organisms.txt -motifs P0:WYIAfLVM P2:ST -positions 1,3,5 -numResidues 6
+Windows 10:
+runInParallel.py -organisms all_organisms.txt -numResidues 6 -motifs P0:WIYAFLVM P2:ST -positions 1,3,5
 
 ```
 
