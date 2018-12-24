@@ -17,6 +17,7 @@ import sys
 # from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from GenerateFileList import parseFileNames
+from summaryFileOutPut import summaryFile
 
 # handle command line arguments
 def parseArgs():
@@ -139,7 +140,7 @@ if __name__ == "__main__":
     with open(args.organisms[:-4]+"_verbose.txt",'w') as f:
         for line in sorted(uniqueLines):
             f.write(line)
-
+    summaryFile("rawTSV/","sequenceLists/","summaryFile.csv")
     # if the user supplies -heatmap flag, create heatmaps for each position provided
     if args.heatmaps:
         print("Creating heat maps...")
