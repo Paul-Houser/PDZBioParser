@@ -262,7 +262,7 @@ class GUI:
         self.lat_name = self.lat_entry.get()
         self.lat_name = self.lat_name.lower().strip().replace(" ","_")
         if len(self.lat_name)!=0:
-            org_tsv = [file for file in os.listdir(tsvs_loc) if self.lat_name.lower() in file][0]
+            org_tsv = [file for file in os.listdir(tsvs_loc) if self.lat_name.lower() in file.lower()][0]
             self.lat_name = [org for org in organisms if self.lat_name in org.lower()]
         matches_to_find = []
         print_to_console,write_to_file = [bool(val) for val in [self.console_print.get(),self.file_write.get()]]
