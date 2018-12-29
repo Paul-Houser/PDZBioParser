@@ -52,7 +52,7 @@ class Backend:
             orgs = []
             for item in os.listdir(tsvs_loc):
                 for org in org_list:
-                    if org in item.lower(): # .lower() is only necessary if filename has caps -- mine do, the repo ones don't
+                    if org in item.lower():
                         orgs.append(item)
             print(org_list)
             for tsv in orgs:
