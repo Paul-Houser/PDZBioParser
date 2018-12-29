@@ -1,9 +1,23 @@
-#written by Michael Lee
+# written by Michael Lee
+
+# 12/28/2018
+
+# This program takes the tsv folder and xml file as arguments and provides a GUI to search for
+# proteins by match num, human sequence, other organism sequence, and Latin name
+
+# very much a work in progress; the code is currently uncommented and badly needs to be cleaned up.
+# This will happen in the next few days.
+
+'''
+PDZGUI0.4
+python PDZGUI0.4.py -tsvFolder /path/folder -xmlFile /path/folder/filename.xml
+'''
+
 import tkinter as tk
 import os
 import xml.etree.ElementTree as ET
-
 import argparse
+
 class Backend:
     def __init__(self,all_seqs,organisms,root,matches_to_find,tsvs_loc,human_tsv,\
                  org_tsv=None,human_seq=None,org_seq=None,lat_name=None,\
@@ -215,6 +229,13 @@ class GUI:
         self.human_tsv =human_tsv
         self.tsvs_loc = tsvs_loc 
         self.xml_loc  = xml_loc
+        
+        # does tsv folder exist?
+        if os.path.exists(tsvs_loc):
+            pass
+        else:
+            raise FileNotFoundError("TSV folder does not exist!")
+            
         # parse xml file
         root,all_seqs,organisms = self.parse_xml(xml_loc)
 
