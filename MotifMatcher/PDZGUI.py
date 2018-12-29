@@ -28,7 +28,7 @@ class Backend:
             human_proteins = self.find_human_proteins_xml(tsvs_loc,human_tsv,matches_to_find,root,org_location,org_seq)
             human_matches = {i:[] for i in matches_to_find}
             for i in matches_to_find:
-                    human_matches[i] = (self.find_human_proteins_tsv(tsvs_loc,human_proteins[i],human_tsv))
+                    human_matches[i] = self.find_human_proteins_tsv(tsvs_loc,human_proteins[i],human_tsv)
             self.output(human_matches,org_matches,console_print,file_write,human_seq,org_seq,lat_name)
             
         elif human_seq and org_seq:
@@ -70,7 +70,7 @@ class Backend:
         with open(filename,'r') as tsv_file:
             
             for line in tsv_file:
-                if line.split("\t")[1].replace("\n","") == human_seq:
+                if line.split("\t")[1].replace("\n","") in human_seq:
                     protein_matches.append(line)
         return protein_matches
 
