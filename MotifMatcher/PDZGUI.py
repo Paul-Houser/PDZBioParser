@@ -34,15 +34,15 @@ class Backend:
             human_matches = self.find_human_proteins_tsv(tsvs_loc,human_seq,human_tsv)
             org_matches = {i:[] for i in matches_to_find}
             for i in matches_to_find:
-                    org_matches[i] = self.find_org_protein(sequences[i],tsvs_loc,tsv_address)
+                org_matches[i] = self.find_org_protein(sequences[i],tsvs_loc,tsv_address)
             self.output(human_matches,org_matches,console_print,file_write,human_seq,org_seq,lat_name)
             
         elif org_seq and lat_name:
-            org_matches = self.find_org_protein(org_seq,tsvs_loc,tsv_address)
+            org_matches = self.find_org_protein([org_seq],tsvs_loc,tsv_address)
             human_proteins = self.find_human_proteins_xml(tsvs_loc,human_tsv,matches_to_find,root,org_location,org_seq)
             human_matches = {i:[] for i in matches_to_find}
             for i in matches_to_find:
-                    human_matches[i] = self.find_human_proteins_tsv(tsvs_loc,human_proteins[i],human_tsv)
+                human_matches[i] = self.find_human_proteins_tsv(tsvs_loc,human_proteins[i],human_tsv)
             self.output(human_matches,org_matches,console_print,file_write,human_seq,org_seq,lat_name)
             
         elif human_seq and org_seq:
@@ -52,12 +52,12 @@ class Backend:
             orgs = []
             for item in os.listdir(tsvs_loc):
                 for org in org_list:
-                    if org in item:
+                    if org in item.lower(): # .lower() is only necessary if filename has caps -- mine do, the repo ones don't
                         orgs.append(item)
             print(org_list)
             for tsv in orgs:
                 tsv_address = tsvs_loc + "/" + tsv
-                matches = self.find_org_protein(org_seq,tsvs_loc,tsv_address)
+                matches = self.find_org_protein([org_seq],tsvs_loc,tsv_address)
                 org_matches.extend(matches)
             self.output(human_matches,org_matches,console_print,file_write,human_seq,org_seq,lat_name)
 
@@ -103,14 +103,13 @@ class Backend:
                         continue
         return match_dict
 
-    def find_org_protein(self,org_seq,tsvs_loc,tsv_address):
+    def find_org_protein(self,org_seq_list,tsvs_loc,tsv_address):
         count=0
         protein_matches = []
         with open(tsv_address,'r') as tsv_file:
-            org_seq = set(org_seq)
+            org_seq_set = set(org_seq_list)
             for line in tsv_file:
-                
-                if line.replace("\n","").split("\t")[1] in org_seq:
+                if line.replace("\n","").split("\t")[1] in org_seq_set:
                     protein_matches.append(line)
         return protein_matches
 
