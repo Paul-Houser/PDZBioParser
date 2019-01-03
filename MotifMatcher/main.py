@@ -39,8 +39,10 @@ if __name__ == "__main__":
     else:
         # get the operating system
         OpSys = sys.platform
+        print(OpSys)
+        input()
         # decide whether to using the makeXML or the python motifFileMaker
-        if OpSys in ["win32","linux2"]:
+        if OpSys in ["win32","linux"]:
             makeXMLWrapper.callMakeXML(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
         else:
             motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)

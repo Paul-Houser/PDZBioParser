@@ -7,7 +7,7 @@ def callMakeXML(inTSVFolder,motif_type,motifLen,outFile,refOrganism):
     OpSys= sys.platform
     if OpSys == "win32":
         findFunc = ctypes.CDLL(cwd + "/lib/makeXML.dll")
-    elif OpSys == "linux2":
+    elif OpSys == "linux":
         findFunc = ctypes.CDLL(cwd + "/lib/makeXML.so")
     else:
         raise AttributeError("unrecognized operating system")
