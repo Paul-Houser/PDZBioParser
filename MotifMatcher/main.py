@@ -5,6 +5,7 @@ import motifCounterXMLParse
 import os
 import time
 import makeXMLWrapper
+import PDZGUI
 def parseArgs():
     parser = argparse.ArgumentParser(
         description='TODO')
@@ -27,6 +28,8 @@ def parseArgs():
                         help = "If a xml file has all ready been generated use  this flag to skip xml generation")
     parser.add_argument("-pyth", action='store_false',required = False, default = True,
                         help = "force the use of motifFileMaker over makeXML. Using this flag will slowdown exicution.")
+    parser.add_argument("-GUI", action='store_true',required = False, default = False,
+                        help = "Launch GUI automatically after program exicution.")
     return parser.parse_args()
 if __name__ == "__main__":
     args = parseArgs()
@@ -36,6 +39,7 @@ if __name__ == "__main__":
     motif = {(5-int(k[0])):set(list(k[1])) for k in[i.replace('P','').split(':') for i in args.inputValues]}
     xmlFileName = args.out +".xml"
     tsvFileName = args.out +".tsv"
+    
     if args.decouple:
         motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
     else:
@@ -50,4 +54,6 @@ if __name__ == "__main__":
             motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
         motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
     print("completed in: " +str(time.clock()-start))
+    if args.GUI:
+        PDZGUI.PDZGUI_wrapper(folderName + '/',xmlFileName)
     

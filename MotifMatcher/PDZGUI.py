@@ -4,7 +4,7 @@
 # updated 1/1/2019 (bug fixes, comments)
 
 # This program takes the tsv folder and xml file as arguments and provides a GUI to search for
-# proteins by match num, human sequence, other organism sequence, and Latin name.
+# proteins by match num, ref sequence, other organism sequence, and Latin name.
 
 
 '''
@@ -19,12 +19,12 @@ import argparse
 
 class Backend: # the fun stuff happens here...
     def __init__(self,all_seqs,organisms,root,matchValues,tsvs_folder,refOrg,\
-                 org_tsv=None,human_seq=None,org_seq=None,lat_name=None,\
+                 org_tsv=None,ref_seq=None,org_seq=None,lat_name=None,\
                  console_print=None,file_write=None):
         
-        # if a humanseq was specified, find its location in the list of all refOrg sequences
-        if human_seq:
-            hseq_location = all_seqs.index(human_seq)
+        # if a refseq was specified, find its location in the list of all refOrg sequences
+        if ref_seq:
+            hseq_location = all_seqs.index(ref_seq)
 
         # if a lat name was specified, find its location in the list of all orgs
         # and specify tsv path
@@ -32,37 +32,37 @@ class Backend: # the fun stuff happens here...
             org_location = organisms.index(lat_name)
             tsv_address = tsvs_folder + "/" + org_tsv
         
-        if human_seq and lat_name:
+        if ref_seq and lat_name:
             # find relevant org sequences from xml
             sequences = self.sequences_from_xml(hseq_location,org_location,root,matchValues)
 
-            # find relevant human proteins from tsv
-            human_matches = self.find_human_proteins_tsv(tsvs_folder,[human_seq],refOrg)
+            # find relevant ref proteins from tsv
+            ref_matches = self.find_ref_proteins_tsv(tsvs_folder,[ref_seq],refOrg)
 
             # find relevant org proteins from tsv (based on xml data)
             org_matches = {i:[] for i in matchValues}
             for i in matchValues:
                 org_matches[i] = self.find_org_protein(sequences[i],tsvs_folder,tsv_address)
                 
-            self.output(human_matches,org_matches,console_print,file_write,human_seq,org_seq,lat_name)
+            self.output(ref_matches,org_matches,console_print,file_write,ref_seq,org_seq,lat_name)
             
         elif org_seq and lat_name:
             # find relevant org sequences from tsv
             org_matches = self.find_org_protein([org_seq],tsvs_folder,tsv_address)
 
-            # find relevant human proteins from xml
-            human_proteins = self.find_human_proteins_xml(matchValues,root,org_location,org_seq)
+            # find relevant ref proteins from xml
+            ref_proteins = self.find_ref_proteins_xml(matchValues,root,org_location,org_seq)
 
-            # find relevant human proteins from tsv (based on xml data)
-            human_matches = {i:[] for i in matchValues}
+            # find relevant ref proteins from tsv (based on xml data)
+            ref_matches = {i:[] for i in matchValues}
             for i in matchValues:
-                human_matches[i] = self.find_human_proteins_tsv(tsvs_folder,human_proteins[i],refOrg)
+                ref_matches[i] = self.find_ref_proteins_tsv(tsvs_folder,ref_proteins[i],refOrg)
                 
-            self.output(human_matches,org_matches,console_print,file_write,human_seq,org_seq,lat_name)
+            self.output(ref_matches,org_matches,console_print,file_write,ref_seq,org_seq,lat_name)
             
-        elif human_seq and org_seq:
-            # find relevant human sequences from tsv
-            human_matches = self.find_human_proteins_tsv(tsvs_folder,human_seq,refOrg)
+        elif ref_seq and org_seq:
+            # find relevant ref sequences from tsv
+            ref_matches = self.find_ref_proteins_tsv(tsvs_folder,ref_seq,refOrg)
 
             # find relevant organisms from xml
             org_list = self.orgs_from_xml(hseq_location,org_seq,root)
@@ -81,7 +81,7 @@ class Backend: # the fun stuff happens here...
                 matches = self.find_org_protein([org_seq],tsvs_folder,tsv_address)
                 org_matches.extend(matches)
                 
-            self.output(human_matches,org_matches,console_print,file_write,human_seq,org_seq,lat_name)
+            self.output(ref_matches,org_matches,console_print,file_write,ref_seq,org_seq,lat_name)
 
     def none_to_string(self,a_string):
         # when ET creates a tree from an xml file, the contents of empty nodes are type None.
@@ -90,7 +90,7 @@ class Backend: # the fun stuff happens here...
         return a_string or ''
 
     def sequences_from_xml(self,hseq_location,org_location,root,matchValues):
-        # this function returns all org sequences for a given human sequence and a given organism
+        # this function returns all org sequences for a given ref sequence and a given organism
         location = root[0][hseq_location][org_location]
 
         # the keys are the matchvalues of interest. The values are lists of sequences
@@ -99,11 +99,11 @@ class Backend: # the fun stuff happens here...
 
     def orgs_from_xml(self,hseq_location,org_seq,root):
         # this function parses the xml file and returns all orgs with a given sequence,
-        # given a specific human sequence
+        # given a specific ref sequence
         ref_seq = root[0][hseq_location]
         org_list = []
         for nonRefOrganism in ref_seq:
-            # make a list of all sequences for a given human seq and given organism name
+            # make a list of all sequences for a given ref seq and given organism name
             for i in range(6):
                 seq_list = []
                 seq_string = nonRefOrganism[i].text
@@ -115,20 +115,20 @@ class Backend: # the fun stuff happens here...
                     org_list.append(list(nonRefOrganism.attrib.values())[0][:-4].lower())
         return org_list
 
-    def find_human_proteins_tsv(self,tsvs_folder,human_seq_list,refOrg):
-        # this function returns all proteins from the human tsv whose sequence is in
-        # human_seq_list
+    def find_ref_proteins_tsv(self,tsvs_folder,ref_seq_list,refOrg):
+        # this function returns all proteins from the ref tsv whose sequence is in
+        # ref_seq_list
         protein_matches = []
         filename = tsvs_folder + "/" + refOrg
         with open(filename,'r') as tsv_file:
             
             for line in tsv_file:
-                if line.split("\t")[1].replace("\n","") in human_seq_list:
+                if line.split("\t")[1].replace("\n","") in ref_seq_list:
                     protein_matches.append(line)
         return protein_matches
 
-    def find_human_proteins_xml(self,matchValues,root,org_location,org_seq):
-        # given organism sequence and match values of interest, find human sequences
+    def find_ref_proteins_xml(self,matchValues,root,org_location,org_seq):
+        # given organism sequence and match values of interest, find ref sequences
         match_dict = {i:[] for i in matchValues}
         for i in matchValues:
             
@@ -141,7 +141,7 @@ class Backend: # the fun stuff happens here...
                 for protein in protein_list:
                     if protein == org_seq:
                         match_dict[i].append(list(hum_seq.attrib.values())[0])  # if the specified organism sequence is in protein_list, then
-                                                                                # the human protein (hum_seq) is interesting and should
+                                                                                # the ref protein (hum_seq) is interesting and should
                                                                                 # eventually be outputted, so it's saved to a dictionary.
                         continue
         return match_dict
@@ -158,24 +158,24 @@ class Backend: # the fun stuff happens here...
                     protein_matches.append(line)
         return protein_matches
 
-    def output(self,human_matches,org_matches,console_print,file_write,human_seq,org_seq,lat_name):
-        to_output = "Human proteins matching the input criteria:\n"
+    def output(self,ref_matches,org_matches,console_print,file_write,ref_seq,org_seq,lat_name):
+        to_output = "Reference proteins matching the input criteria:\n"
         
-        if type(human_matches) is list:
-            # if a human sequence was provided in the initial input, then human_matches is list.
-            for match in human_matches:
-                human_matches_pretty = [(match.split("\t")[1].replace("\n",""),match.split("\t")[0]) for match in human_matches]
-            for match in human_matches_pretty:
+        if type(ref_matches) is list:
+            # if a ref sequence was provided in the initial input, then ref_matches is list.
+            for match in ref_matches:
+                ref_matches_pretty = [(match.split("\t")[1].replace("\n",""),match.split("\t")[0]) for match in ref_matches]
+            for match in ref_matches_pretty:
                 to_output+=match[0]+"\t"+match[1]+"\n\n"
                 
-        elif type(human_matches) is dict:
-            # if a human sequence was NOT provided in the initial input, then human_matches is dict.
-            for match_num in human_matches:
+        elif type(ref_matches) is dict:
+            # if a ref sequence was NOT provided in the initial input, then ref_matches is dict.
+            for match_num in ref_matches:
                 to_output+="{0} match:\n".format(match_num)
-                human_matches_pretty = [(match.split("\t")[1].replace("\n",""),match.split("\t")[0]) for match in human_matches[match_num]]
-                for match in human_matches_pretty:
+                ref_matches_pretty = [(match.split("\t")[1].replace("\n",""),match.split("\t")[0]) for match in ref_matches[match_num]]
+                for match in ref_matches_pretty:
                     to_output+=match[0]+"\t"+match[1]+"\n\n"
-                if len(human_matches_pretty) == 0:
+                if len(ref_matches_pretty) == 0:
                     to_output+="[no matches]\n\n"
                     
         to_output+="\n\nother proteins matching the input criteria:\n\n"
@@ -200,7 +200,7 @@ class Backend: # the fun stuff happens here...
         if console_print:
             print(to_output)
         if file_write:
-            file_name = "{0} {1} {2}.txt".format(human_seq,org_seq,lat_name[:-4])
+            file_name = "{0} {1} {2}.txt".format(ref_seq,org_seq,lat_name[:-4])
             with open(file_name,'w') as file_object:
                 file_object.write(to_output)
                 print("--task completed--")
@@ -222,8 +222,8 @@ class GUI:
         self.instructions.grid(columnspan=8,sticky=tk.W)
 
         # Labels
-        self.human_seq_label = tk.Label(master, text="Human sequence:")
-        self.human_seq_label.grid(columnspan=5,sticky = tk.W)
+        self.ref_seq_label = tk.Label(master, text="Reference sequence:")
+        self.ref_seq_label.grid(columnspan=5,sticky = tk.W)
 
         self.org_seq_label = tk.Label(master, text="other org sequence:   ")
         self.org_seq_label.grid(columnspan=5,sticky = tk.W)
@@ -232,8 +232,8 @@ class GUI:
         self.lat_name_label.grid(columnspan=3,sticky=tk.W)
 
         # Entry boxes (Human sequence, org sequence, Lat name)
-        self.human_entry = tk.Entry(master,width=15)
-        self.human_entry.grid(columnspan=4,row=1,column=4,sticky=tk.W)
+        self.ref_entry = tk.Entry(master,width=15)
+        self.ref_entry.grid(columnspan=4,row=1,column=4,sticky=tk.W)
 
         self.org_entry = tk.Entry(master,width=15)
         self.org_entry.grid(columnspan=4,row=2,column=4,sticky=tk.W)
@@ -307,8 +307,8 @@ class GUI:
         # All of the refsequences in the xml are gathered into a list.
         all_seqs = [list(child.attrib.values())[0] for child in root[0]]
         
-        # root[0] contains a comma- and semicolon- separated string of all nonhuman orgs.
-        # A list is created with the names of all nonhuman orgs.
+        # root[0] contains a comma- and semicolon- separated string of all nonref orgs.
+        # A list is created with the names of all nonref orgs.
         organisms = list(root[0].attrib.values())[0].split(";")
         organisms = [item.split(",") for item in organisms]
         organisms = [organisms[x][0] for x in range(1,len(organisms))] # start with 1 because homo_sapiens is in position 0
@@ -317,7 +317,7 @@ class GUI:
 
     def get_entries_and_run(self,organisms,tsvs_folder,refOrg,all_seqs,root):
         # gets data from input boxes as strings. Empty boxes become blank strings "".
-        self.human_seq = self.human_entry.get()
+        self.ref_seq = self.ref_entry.get()
         self.org_seq = self.org_entry.get()
         self.lat_name = self.lat_entry.get()
         self.lat_name = self.lat_name.lower().strip().replace(" ","_") # lowercase is better. Spaces are bad. Underscores are friendly.
@@ -351,17 +351,17 @@ class GUI:
                 matchValues.append(-i+6)
                 
         if self.check_for_valid(): # if user input is ok...
-            if self.human_seq != "" and self.lat_name != "":
+            if self.ref_seq != "" and self.lat_name != "":
                 computation = Backend(all_seqs,organisms,root,matchValues,tsvs_folder,refOrg,\
-                                      org_tsv,self.human_seq,lat_name=self.lat_name,\
+                                      org_tsv,self.ref_seq,lat_name=self.lat_name,\
                                       console_print=print_to_console,file_write=write_to_file)
             elif self.org_seq != "" and self.lat_name != "":
                 computation = Backend(all_seqs,organisms,root,matchValues,tsvs_folder,refOrg,\
                                       org_tsv,org_seq=self.org_seq,lat_name=self.lat_name,console_print=print_to_console,\
                                       file_write=write_to_file)
-            elif self.human_seq != "" and self.org_seq != "":
+            elif self.ref_seq != "" and self.org_seq != "":
                 computation = Backend(all_seqs,organisms,root,matchValues,tsvs_folder,refOrg,\
-                                      human_seq=self.human_seq,org_seq=self.org_seq,\
+                                      ref_seq=self.ref_seq,org_seq=self.org_seq,\
                                       console_print=print_to_console,file_write=write_to_file)
             else:
                 pass # the program shouldn't ever get here, because check_for_valid would have raised an error
@@ -370,18 +370,18 @@ class GUI:
 
     def check_for_valid(self):
         amino_acids = ["A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R","S","T","V","W","Y"]
-        humanSeqOk = -1
+        refSeqOk = -1
         orgSeqOk = -1
         latNameOk = -1
         error_message = "" # stays blank unless user input is invalid
         
-        if len(self.human_seq) == 6 and all(x.upper() in amino_acids for x in self.human_seq):
-            humanSeqOk = True
-            self.human_seq = self.human_seq.upper()
-        elif self.human_seq == "":
+        if len(self.ref_seq) == 6 and all(x.upper() in amino_acids for x in self.ref_seq):
+            refSeqOk = True
+            self.ref_seq = self.ref_seq.upper()
+        elif self.ref_seq == "":
             pass
         else:
-            humanSeqOk = False
+            refSeqOk = False
             error_message+="Human sequence not OK. "
         if len(self.org_seq) == 6 and all(x.upper() in amino_acids for x in self.org_seq):
             orgSeqOk = True
@@ -398,14 +398,28 @@ class GUI:
         else:
             pass
         
-        if all([humanSeqOk,orgSeqOk,latNameOk]): # i.e. if none of them are False...
-            if sum([humanSeqOk,orgSeqOk,latNameOk])==1:# i.e. if exactly two boxes are filled (1+1-1 == 1)
+        if all([refSeqOk,orgSeqOk,latNameOk]): # i.e. if none of them are False...
+            if sum([refSeqOk,orgSeqOk,latNameOk])==1:# i.e. if exactly two boxes are filled (1+1-1 == 1)
                 return True
             else:
                 raise RuntimeError("Make sure that exactly two boxes are filled!")
         else:
             raise ValueError(error_message)
-
+def PDZGUI_wrapper(tsvs_folder, xml_path):
+    with open(xml_path,'rb') as f:
+        tree = ET.iterparse(f,events=("start", "end"))
+        for event,element in tree:
+            if element.tag == "Summary":
+                motifRuningSumAndProteinTotals = element.attrib['name']
+                refOrg = [protein.split(',') for protein in motifRuningSumAndProteinTotals.split(";")][0][0]
+                break
+    
+    source = tk.Tk()
+    source.geometry("350x240")
+    source.grid_rowconfigure(7,minsize=40)
+    protein_gui = GUI(source, refOrg, tsvs_folder, xml_path)
+    source.mainloop()
+    
 def parseArgs():
     parser = argparse.ArgumentParser(description="protein retrieval")
     parser.add_argument('-tsvFolder',required=True,type=str,
@@ -424,9 +438,5 @@ if __name__ == "__main__":
         raise FileNotFoundError("tsv folder location invalid.")
     if not os.path.exists(xml_path):
         raise FileNotFoundError("xml file location invalid.")
-    refOrg = "homo_sapiens_TaxID_9606_R_yes.tsv"
-    source = tk.Tk()
-    source.geometry("350x240")
-    source.grid_rowconfigure(7,minsize=40)
-    protein_gui = GUI(source, refOrg, tsvs_folder, xml_path)
-    source.mainloop()
+    PDZGUI_wrapper(tsvs_folder, xml_path)
+    

@@ -7,6 +7,7 @@ import math as m
 def normal(x):
     return (1/(2*m.pi)**0.5 )* m.e**(-(x**2)/2)
 def rational_approx(t):
+    #approximation of the inverse error function
     a = [2.515517, 0.802853, 0.010328]
     b = [1.432788, 0.189269, 0.001308]
     num= (a[2]*t + a[1])*t + a[0]
@@ -19,11 +20,13 @@ def normal_CDF_inverse(p):
     else:
         return rational_approx( m.sqrt(-2*m.log(1-p)) )
 def nCr(n, r):
+    # n choose r mathematical function
     r = min(r, n-r)
     num = reduce(mul, range(n, n-r, -1), 1)
     den = reduce(mul, range(1, r+1), 1)
     return num / den
 def getComb(motif,numResidues):
+    #return all of the possible unique combinations of the given motif
     nonMotif = numResidues-len(motif)
     motif =[len(motif[x]) for x in motif]
     radx = [motif.count(x) for x in sorted(set(motif))]+[nonMotif]
@@ -56,35 +59,7 @@ def calcExpected(n,a,PValues):
 def calcStanDev(n,PValues,P_actu):
 
     return [(P_actu[i]/n-PValues[i])/((PValues[i]*(1-PValues[i])/n)**0.5) for i in range(len(PValues))]
-"""
-# functions that interpret the resulsts of the xml file generate by motif file maker and return a tsv file
-def findMotifs(fileName):
-  #  #Parses the xml output of motif file maker and generate a dictionary that has a list of the counts
-  #  for the number of matches for each sequenc
-    motifRuningSum = {}
-    tree = ET.parse(fileName)
-    root = tree.getroot()
-    # iterates through the reference sequences in the file
-    for summary in root:
-        proteinTotals = summary.attrib['name']
-        for refSequence in summary:
-            
-            refSequenceKey = refSequence.attrib['name']
-            motifRuningSum[refSequenceKey] = []
-            # iterate through the organisms for the given reference sequence
-            for organism in refSequence :
-                score = []
-                # iterate through the matching sequences for the organism for the given reference sequence
-                for matchscore in organism:
-                    # if there are matches count them if not append 0 to the score list
-                    if matchscore.text:
-                        score.append(len(matchscore.text.split(",")))
-                    else:
-                        score.append(0)
-                
-                motifRuningSum[refSequenceKey] .append({organism.attrib['name']:score})
-    return motifRuningSum,proteinTotals
-    """
+
 # functions that interpret the resulsts of the xml file generate by motif file maker and return a tsv file
 def findMotifs(fileName,numResidues):
     """Parses the xml output of motif file maker and generate a dictionary that has a list of the counts
