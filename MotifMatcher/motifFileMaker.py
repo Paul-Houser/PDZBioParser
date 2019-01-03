@@ -59,7 +59,6 @@ def motif_Finder(inTSVFolder,motif_type,motifLen,outFile,refOrganism):
             for score in range(motifLen,0,-1):
                 matchScore = etree.SubElement(NonRefOrganism, "match"+str(score)).text = ",".join(tempDict[score])
         if counter > 10000:
-            print(refNum)
             tree = etree.ElementTree(node)
             writeFile.write(etree.tostring(tree, pretty_print=True).replace(b"<node>",b"").replace(b"</node>",b""))
             node.clear()
