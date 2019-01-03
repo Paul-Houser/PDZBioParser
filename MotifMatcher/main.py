@@ -4,6 +4,7 @@ import motifFileMaker
 import motifCounterXMLParse
 import os
 import time
+import makeXMLWrapper
 def parseArgs():
     parser = argparse.ArgumentParser(
         description='TODO')
@@ -36,7 +37,12 @@ if __name__ == "__main__":
     if args.decouple:
         motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
     else:
-        motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
+        OpSys = sys.platform
+        
+        if OpSys in ["win32","linux2"]:
+            makeXMLWrapper.callMakeXML(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
+        else:
+            motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
         motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
     print("completed in: " +str(time.clock()-start))
     
