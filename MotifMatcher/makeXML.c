@@ -74,7 +74,7 @@ void makeXML(const char *** EntireArray,int * EntireArrayLen, int EntireLen, con
                 }
             }
         }
-    fprintf(writeFile,"\t\t</RefSequence>\n");
+        fprintf(writeFile,"\t\t</RefSequence>\n");
     }
     fprintf(writeFile,"\t</Summary>\n");
     fprintf(writeFile,"</root>\n");

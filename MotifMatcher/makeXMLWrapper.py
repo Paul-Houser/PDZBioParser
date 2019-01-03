@@ -60,5 +60,6 @@ def callMakeXML(inTSVFolder,motif_type,motifLen,outFile,refOrganism):
     organisms = (ctypes.c_char_p*len(orgList))()
     organisms[:] = orgList
     summary = (refOrganism.encode("utf-8")+b","+str(len(refEndings)).encode("utf+8")+b";" +b";".join([b",".join([key,str(len(value)).encode("utf-8")]) for key, value in allEndings.items()]))
+    #pass arguments to to makeXML
     function(ptrEA,EntireArrayLen,len(orgList),refArray,len(refEndings),motifLen,outFile.encode("utf-8"),organisms,summary)
     

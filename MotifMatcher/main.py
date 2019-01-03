@@ -37,8 +37,9 @@ if __name__ == "__main__":
     if args.decouple:
         motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
     else:
+        # get the operating system
         OpSys = sys.platform
-        
+        # decide whether to using the makeXML or the python motifFileMaker
         if OpSys in ["win32","linux2"]:
             makeXMLWrapper.callMakeXML(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
         else:
