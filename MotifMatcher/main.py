@@ -25,6 +25,8 @@ def parseArgs():
                         help='significance cut off value example 0.95 corresponds to P<0.05 or 5% chance the item was flagged in error')
     parser.add_argument("-decouple", action='store_true',required = False, default = False,
                         help = "If a xml file has all ready been generated use  this flag to skip xml generation")
+    parser.add_argument("-pyth", action='store_false',required = False, default = True,
+                        help = "force the use of motifFileMaker over makeXML. Using this flag will slowdown exicution.")
     return parser.parse_args()
 if __name__ == "__main__":
     args = parseArgs()
@@ -39,12 +41,12 @@ if __name__ == "__main__":
     else:
         # get the operating system
         OpSys = sys.platform
-        print(OpSys)
-        input()
         # decide whether to using the makeXML or the python motifFileMaker
-        if OpSys in ["win32","linux"]:
+        if OpSys in ["win32","linux2"] and args.pyth:
+            print('make')
             makeXMLWrapper.callMakeXML(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
         else:
+            print("pyth")
             motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
         motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
     print("completed in: " +str(time.clock()-start))
