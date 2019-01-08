@@ -12,3 +12,5 @@ nematostella vectensis 45351 no
 rattus norvegicus 10116 no
 saccharomyces cerevisiae 559292 yes
 xenopus tropicalis 8364 no
+Monosiga brevicollis 81824 no
+arabidopsis thaliana
