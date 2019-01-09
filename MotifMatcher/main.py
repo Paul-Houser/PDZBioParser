@@ -18,7 +18,7 @@ def parseArgs():
                         Usage: /path/folder")
     parser.add_argument('-numResidues', required=True, type=int, 
                         help='The number of residues to provide statistics on. Usage: 6')
-    parser.add_argument('-inputValues', required=True,nargs='+',
+    parser.add_argument('-motifs', required=True,nargs='+',
                         help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
     parser.add_argument('-out', required=True, type=str,
                         help='out put file directory')
@@ -35,8 +35,8 @@ if __name__ == "__main__":
     args = parseArgs()
     start = time.clock()
     folderName = os.path.normpath(args.sequenceFolder)
-    motifName ='-'.join(args.inputValues).replace(':','_')
-    motif = {(5-int(k[0])):set(list(k[1])) for k in[i.replace('P','').split(':') for i in args.inputValues]}
+    motifName ='-'.join(args.motifs).replace(':','_')
+    motif = {(5-int(k[0])):set(list(k[1])) for k in[i.replace('P','').split(':') for i in args.motifs]}
     xmlFileName = args.out +".xml"
     tsvFileName = args.out +".tsv"
     
