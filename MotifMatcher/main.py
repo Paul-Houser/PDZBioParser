@@ -36,7 +36,7 @@ if __name__ == "__main__":
     start = time.clock()
     folderName = os.path.normpath(args.sequenceFolder)
     motifName ='-'.join(args.motifs).replace(':','_')
-    motif = {(5-int(k[0])):set(list(k[1])) for k in[i.replace('P','').split(':') for i in args.motifs]}
+    motif = {(args.numResidues-1-int(k[0])):set(list(k[1])) for k in[i.replace('P','').split(':') for i in args.motifs]}
     xmlFileName = args.out +".xml"
     tsvFileName = args.out +".tsv"
     

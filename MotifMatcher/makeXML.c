@@ -57,7 +57,7 @@ void makeXML(const char *** EntireArray,int * EntireArrayLen, int EntireLen, con
             /*write the sequences to the file */
             
             fprintf(writeFile,"\t\t\t<NonRefOrganism name=\"%s\">\n",organisms[i]);
-            for (int s = 6;s >0;s-- ){
+            for (int s = motifLen;s >0;s-- ){
                 if (scoreArray[s][0] != '0'){
                     scoreArray[s][indexArray[s]-1]  = '\0';
                     fprintf(writeFile,"\t\t\t\t<match%d>%s</match%d>\n",s,scoreArray[s],s);
