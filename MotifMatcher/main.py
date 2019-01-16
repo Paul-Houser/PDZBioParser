@@ -23,7 +23,7 @@ def parseArgs():
     parser.add_argument('-out', required=True, type=str,
                         help='out put file directory')
     parser.add_argument('-significance', required=True, type=float,
-                        help='significance cut off value example 0.95 corresponds to P<0.05 or 5% chance the item was flagged in error')
+                        help='significance cut off value example 0.95 corresponds to P<0.05 or 5 percent chance the item was flagged in error')
     parser.add_argument("-decouple", action='store_true',required = False, default = False,
                         help = "If a xml file has all ready been generated use  this flag to skip xml generation")
     parser.add_argument("-pyth", action='store_false',required = False, default = True,
