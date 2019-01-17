@@ -10,7 +10,7 @@ numpy,
 matplotlib,
 ## Usage
 ```
-runInParallel.py [-h] -organisms ORGANISMS -positions POSITIONS
+main.py [-h] -organisms ORGANISMS -positions POSITIONS
                         -numResidues NUMRESIDUES
                         [-inputValues INPUTVALUES [INPUTVALUES ...]] [-c]
                         [-heatmaps] [-motifID MOTIFID]
@@ -37,7 +37,7 @@ Optional arguments:
                         Usage: motif1
 Example usage:
 Linux:
-python3 runInParallel.py -organisms all_organisms.txt -motifs P0:WYIAfLVM P2:ST -positions 1,3,5 -numResidues 6
+python3 main.py -organisms all_organisms.txt -motifs P0:WYIAfLVM P2:ST -positions 1,3,5 -numResidues 6
 Windows 10:
 runInParallel.py -organisms all_organisms.txt -numResidues 6 -motifs P0:WIYAFLVM P2:ST -positions 1,3,5
 
