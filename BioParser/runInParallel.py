@@ -37,6 +37,8 @@ def parseArgs():
         help='Add this flag to make enrichment heat maps for csv data.')
     parser.add_argument('-motifID', type=str, default="motif",
         help="If heatmaps are created, use this naming convention. Usage: motif1")
+    parser.add_argument('--evol',help="use phylogenetically ordered org list",
+                        action="store_true") ## MICHAEL'S ADDITION
     return parser.parse_args()
 
 '''
@@ -96,7 +98,7 @@ organisms (list) -- organisms extracted from provided file
 motifID (str)    -- identifier for current motif
 positions (list) -- positions to create heat maps of
 """
-def createHeatmaps(organisms, motifID, positions):
+def createHeatmaps(organisms, motifID, positions, special_ordered):
     for p in positions:
         infiles = '/csv/*' + p + '.csv'
 
@@ -105,7 +107,12 @@ def createHeatmaps(organisms, motifID, positions):
         outfile = motifID + '/' + title + '.png'
        
         os.system(sys.executable + " extractCSV.py " + "--files " + infiles + " -outfile " + pickle)
-        os.system(sys.executable + " createHeatMap.py " + "--enrichment " + pickle + ' --out ' + outfile + ' -title ' + title + ' -organisms ' + organisms)
+
+        ## MICHAEL'S ADDITIONS
+        if special_ordered:
+            os.system(sys.executable + " createHeatMap.py " + "--enrichment " + pickle + ' --out ' + outfile + ' -title ' + title + ' -organisms ' + organisms + ' --ordered')
+        else:
+            os.system(sys.executable + " createHeatMap.py " + "--enrichment " + pickle + ' --out ' + outfile + ' -title ' + title + ' -organisms ' + organisms)
         
 
 if __name__ == "__main__":
@@ -141,12 +148,16 @@ if __name__ == "__main__":
         for line in sorted(uniqueLines):
             f.write(line)
     summaryFile("rawTSV/","sequenceLists/","summaryFile.csv")
+    
     # if the user supplies -heatmap flag, create heatmaps for each position provided
+    
+    special_ordered = args.evol ## MICHAEL'S ADDITION
+    
     if args.heatmaps:
         print("Creating heat maps...")
         if not os.path.exists(args.motifID):
             os.makedirs(args.motifID)
-        createHeatmaps(args.organisms, args.motifID, positions)
+        createHeatmaps(args.organisms, args.motifID, positions, special_ordered)
 
     # if the user supplies -c flag, combine CSVs with combineData.py
     if args.c:

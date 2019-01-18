@@ -22,6 +22,7 @@ optional arguments:
   --out OUT             png file to write plot to.
 """
 
+import os
 import argparse
 import pickle
 import numpy as np
@@ -33,6 +34,8 @@ from mpl_toolkits.axes_grid1 import AxesGrid
 from matplotlib import cm
 import matplotlib.pyplot as plt
 from GenerateFileList import parseFileNames
+from phylogeny import order_orgs ## MICHAEL'S ADDITION
+
 #negative charge, positive charge, aromatic, aliphatic, polar, other
 aminoacids = [["D", "E"],["H", "K", "R"],["F", "W", "Y"],["A", "I", "L", "V"],["N", "Q", "S", "T"],["G", "P", "M", "C"]]
 
@@ -202,6 +205,8 @@ def parseArguments():
         help="Title for plot.")
     parser.add_argument("--out", required="store_true", type=str,
         help="png file to write plot to.")
+    parser.add_argument("--ordered",help="use phylogenetically ordered org list",
+                        action="store_true") ## MICHAEL'S ADDITION
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -211,6 +216,14 @@ if __name__ == "__main__":
     # Load pickle files and store organisms present
     # If an organism file is supplied, compare organisms in pickle file to provided file 
     data, organisms = getData(args.enrichment, args.organisms)
+
+    orderedorgs = args.ordered ## MICHAEL'S ADDITION
+    if orderedorgs:
+        organisms,tree = order_orgs(organisms)
+        tree_out = args.out[:-14] + ".txt"
+        if not os.path.exists(tree_out):
+            with open(tree_out,'w') as file_object:
+                file_object.write(tree)
     
     # Create array of enrichment values for heat map
     enrichments = getEnrichmentArray(data, organisms, aminoacids)
