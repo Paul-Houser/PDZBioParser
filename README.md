@@ -50,10 +50,10 @@ General Structure:
 Name TaxonID Reviewed/Unreviewed
 
 Example.
-bos taurus 9913 no
-caenorhabditis elegans 6239 no
-escherichia coli 83333 yes
-homo sapiens 9606 yes
+bos taurus 9913 unreviewed
+caenorhabditis elegans 6239 unreviewed
+escherichia coli 83333 reviewed
+homo sapiens 9606 reviewed
 ```
 # MotifMatcher
 # Reqirements
@@ -86,6 +86,17 @@ Arguments:
                         significance cut off value example 0.9999 corresponds
                         to P<0.0001 or 0.1 percent chance the item was flagged
                         in error
+  -decouple             If a xml file has all ready been generated use this
+                        flag to skip xml generation
+  -pyth                 force the use of motifFileMaker over makeXML. Using
+                        this flag will slowdown exicution.
+  -GUI                  Launch GUI automatically after program exicution.
+
+     
 Example Usage:
-python3 main.py -refOrganism homo_sapiens_TaxID_9606_R_yes.tsv -sequenceFolder rawTSV/ -numResidues 6 -inputValues P0:WYIAFLVM P2:ST -out motif_2_human -significance 0.9999
+Linux
+python3 main.py -refOrganism homo_sapiens_TaxID_9606_R_reviewed.tsv -sequenceFolder rawTSV/ -numResidues 6 -inputValues P0:WYIAFLVM P2:ST -out motif_2_human -significance 0.9999
+Windows
+main.py -refOrganism homo_sapiens_TaxID_9606_R_reviewed.tsv -sequenceFolder rawTSV/ -numResidues 6 -inputValues P0:WYIAFLVM P2:ST -out motif_2_human -significance 0.9999
+
 ```
