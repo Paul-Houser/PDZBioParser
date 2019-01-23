@@ -94,5 +94,9 @@ Arguments:
 
      
 Example Usage:
-python3 main.py -refOrganism homo_sapiens_TaxID_9606_R_yes.tsv -sequenceFolder rawTSV/ -numResidues 6 -inputValues P0:WYIAFLVM P2:ST -out motif_2_human -significance 0.9999
+Linux
+python3 main.py -refOrganism homo_sapiens_TaxID_9606_R_reviewed.tsv -sequenceFolder rawTSV/ -numResidues 6 -inputValues P0:WYIAFLVM P2:ST -out motif_2_human -significance 0.9999
+Windows
+main.py -refOrganism homo_sapiens_TaxID_9606_R_reviewed.tsv -sequenceFolder rawTSV/ -numResidues 6 -inputValues P0:WYIAFLVM P2:ST -out motif_2_human -significance 0.9999
+
 ```
