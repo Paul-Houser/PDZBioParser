@@ -6,6 +6,12 @@ import os
 import time
 import makeXMLWrapper
 import PDZGUI
+def autoCompleteFileName(fileName,folder):
+    for file in os.listdir(folder):
+        if fileName in file:
+            return file
+    raise FileNotFoundError
+
 def parseArgs():
     parser = argparse.ArgumentParser(
         description='TODO')
@@ -39,7 +45,7 @@ if __name__ == "__main__":
     motif = {(args.numResidues-1-int(k[0])):set(list(k[1])) for k in[i.replace('P','').split(':') for i in args.motifs]}
     xmlFileName = args.out +".xml"
     tsvFileName = args.out +".tsv"
-    
+    refOrgFile = autoCompleteFileName(args.refOrganism,folderName)
     if args.decouple:
         motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
     else:
@@ -48,10 +54,10 @@ if __name__ == "__main__":
         # decide whether to using the makeXML or the python motifFileMaker
         if OpSys in ["win32","linux2","linux"] and args.pyth:
             print('make')
-            makeXMLWrapper.callMakeXML(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
+            makeXMLWrapper.callMakeXML(folderName+'/',motif,args.numResidues,xmlFileName,refOrgFile)
         else:
             print("pyth")
-            motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,args.refOrganism)
+            motifFileMaker.motif_Finder(folderName+'/',motif,args.numResidues,xmlFileName,refOrgFile)
         motifCounterXMLParse.generateOutput(xmlFileName,tsvFileName,motif,args.numResidues,args.significance)
     print("completed in: " +str(time.clock()-start))
     if args.GUI:
