@@ -13,16 +13,20 @@ def parseFileNames(file):
             for word in words:
                 if word.isdigit():
                     fileName['taxonId'] = word
-                elif word.lower() in set(['no','yes']):
+                elif word.lower() in set(['unreviewed','reviewed']):
                     fileName['R'] = word.lower()
                 else:
                     
                     orgName.append(word)
             if not  fileName["R"]:
-                fileName["R"] = 'no'
+                fileName["R"] = 'unreviewed'
             if not fileName['taxonId']:
                 fileName['taxonId'] = "temp"
             fileName["fileName"] = "_".join(orgName).replace('\n','')+'_'+"TaxID"+"_"+fileName["taxonId"]+"_"+"R_"+fileName["R"]+".fasta"
            
             fileNames.append(fileName["fileName"])
     return fileNames
+
+def reviewedToAPI(x):
+    reviewedToAPI = {"reviewed" : "yes", "unreviewed" : "no"}
+    return reviewedToAPI[x]
