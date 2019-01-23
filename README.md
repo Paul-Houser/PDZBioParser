@@ -50,10 +50,10 @@ General Structure:
 Name TaxonID Reviewed/Unreviewed
 
 Example.
-bos taurus 9913 no
-caenorhabditis elegans 6239 no
-escherichia coli 83333 yes
-homo sapiens 9606 yes
+bos taurus 9913 unreviewed
+caenorhabditis elegans 6239 unreviewed
+escherichia coli 83333 reviewed
+homo sapiens 9606 reviewed
 ```
 # MotifMatcher
 # Reqirements
