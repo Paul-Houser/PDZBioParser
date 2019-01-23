@@ -69,6 +69,10 @@ def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPosit
 
         # parse file
         # if file cannot be found, add to unfound organisms
+
+        ###########################################
+        # read_file() is how parse.py gets called #
+        ###########################################
         
         currentStructure = read_file(currentStructure)
         if not (currentStructure):
@@ -101,6 +105,12 @@ if __name__ == "__main__":
     if not os.path.exists(path):
         open(path, "w").close()
 
+    ###################################################################
+    ###################################################################
+
+    #  IMPORTANT: this is no longer used in any user supplied arguments, and [0, False] is the only sort ever used.
+    #  I didn't delete it because it may be useful in future versions of PDZBioParser.
+    
     # initializes howToSort based on command line input
     # first value is 0,1 meaning key or value, second is reverse = true or false
     # [0, False] is the default sort
@@ -114,6 +124,11 @@ if __name__ == "__main__":
         howToSort = [0, False]
     if sort == 3:
         howToSort = [0, True]
+
+
+    ###################################################################
+    ###################################################################
+
 
     importantPositions = getImportantPositions(args.motifs)
     pList = []
