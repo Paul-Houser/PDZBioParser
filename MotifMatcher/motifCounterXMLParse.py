@@ -2,7 +2,7 @@ from operator import mul
 from lxml import etree as ET
 from functools import reduce
 import math as m
-
+r"main.py -refOrganism bos -sequenceFolder C:\Users\jordan\Downloads\PDZBioParser-master(1)\PDZBioParser-master\BioParser\fastas -numResidues 6 -motifs p0:W p1:W p3:W p4:W -out test1 -significance 0.999 -full"
 # functions necessary to calculate the expected proportion for each level of matching
 def normal(x):
     return (1/(2*m.pi)**0.5 )* m.e**(-(x**2)/2)
@@ -29,7 +29,10 @@ def getComb(motif,numResidues):
     #return all of the possible unique combinations of the given motif
     nonMotif = numResidues-len(motif)
     motif =[len(motif[x]) for x in motif]
+    print(motif)
     radx = [motif.count(x) for x in sorted(set(motif))]+[nonMotif]
+    print(radx)
+    print( reduce (mul,[j+1 for j in radx]))
     chance = [1/x for x in sorted(set(motif))]+[1/20]
     comb = [0]*len(radx)
     allComb =[]
@@ -43,22 +46,32 @@ def getComb(motif,numResidues):
             num -= num1*radxValue[x]
         allComb.append(comb)
         comb = [0]*len(radx)
+    print(allComb)
     return allComb,chance,radx
 def getPValue(allComb,chance,radx):
     PValues = [0]*(1+sum(radx))
     allCombDict = {x:[] for x in range(0,1+sum(radx))}
     for x in allComb:
         allCombDict[sum(x)].append(x)
+    print(allCombDict)
     for x in allCombDict:
         PValues[x] = sum([reduce(mul,[(chance[i]**j[i])*((1-chance[i])**(radx[i]-j[i]))*nCr(radx[i],radx[i]-j[i]) for i in range(len(radx))]) for j in allCombDict[x]])
+    print(PValues)
     return PValues
 def calcExpected(n,a,PValues):
     z = normal_CDF_inverse(a)
-    
+    print(PValues)
     return [[P + z*(P*(1-P)/n)**0.5 , P - z*(P*(1-P)/n)**0.5] for P in PValues]
 def calcStanDev(n,PValues,P_actu):
-
-    return [(P_actu[i]/n-PValues[i])/((PValues[i]*(1-PValues[i])/n)**0.5) for i in range(len(PValues))]
+    print(PValues)
+    print(P_actu)
+    
+    assert sum(PValues) >= 1-(7./3 - 4./3 -1)**0.5
+    for num in range(len(PValues)):
+        if PValues[num] == 0:
+            assert P_actu[num] == 0
+        
+    return [(P_actu[i]/n-PValues[i])/((PValues[i]*(1-PValues[i])/n)**0.5) for i in range(len(PValues)) if PValues[i] != 0]
 
 # functions that interpret the resulsts of the xml file generate by motif file maker and return a tsv file
 def findMotifs(fileName,numResidues):
