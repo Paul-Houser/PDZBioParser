@@ -1,3 +1,10 @@
+# Paul Houser, Milo Rupp, Raiden van Bronkhorst
+
+# November, 2017
+
+# fileOutput is a collection of methods related to the format and output of the data retrieved from
+# parsing the proteomes.
+
 import os
 import datetime
 
@@ -47,24 +54,29 @@ def printSequencesAndIdentifiers(structure):
 #  print data from one dictionary into console and file
 
 
-def printData(fileName, header, dict, percents, searchPosition, howToSort, silent):
+def printData(fileName, header, AminoAcidDict, percents, searchPosition, howToSort, silent):
     f = open(fileName.split(".")[0] + str(searchPosition) + ".csv", 'a')
     if not silent:
         print(header)
     f.write("\n" + header + ",,\n")
-    totalChars = sum(dict.values())
+    
+    totalChars = sum(AminoAcidDict.values())
+   
     if not howToSort:
-        dict = sorted(dict.items(), key=lambda x: x[1], reverse=True)
+        AminoAcidDict = sorted(AminoAcidDict.items(), key=lambda x: x[1], reverse=True)
     else:
-        dict = sorted(
-            dict.items(), key=lambda x: x[howToSort[0]], reverse=howToSort[1])
-    for a in dict:
+        AminoAcidDict = sorted(
+            AminoAcidDict.items(), key=lambda x: x[howToSort[0]], reverse=howToSort[1])
+
+    for a in AminoAcidDict:
         if totalChars > 0:  # and a[1] > 0:
             percentString = ""
             if percents:
                 percentString = str(round(a[1] / totalChars * 100, 4)) + "%"
             if not silent:
                 print(a[0], a[1], percentString)
+       
+            
             f.write(a[0] + "," + str(a[1]) + "," + percentString + "\n")
     f.close()
 

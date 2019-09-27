@@ -1,14 +1,16 @@
-bos taurus 9913 no
-caenorhabditis elegans 6239 no
-callorhinchus milii 7868 no
-danio rerio 7955 no
-dictyostelium discoideum 44689 no
-drosophila melanogaster 7227 no
-escherichia coli 83333 yes
-gallus gallus 9031 no
-homo sapiens 9606 yes
-mus musculus 10090 no
-nematostella vectensis 45351 no
-rattus norvegicus 10116 no
-saccharomyces cerevisiae 559292 yes
-xenopus tropicalis 8364 no
+bos taurus 9913 
+caenorhabditis elegans 6239 
+callorhinchus milii 7868 
+danio rerio 7955
+dictyostelium discoideum 44689
+drosophila melanogaster 7227
+escherichia coli 83333 reviewed
+gallus gallus 9031 
+homo sapiens 9606 reviewed
+mus musculus 10090
+nematostella vectensis 45351
+rattus norvegicus 10116
+saccharomyces cerevisiae 559292 reviewed
+xenopus tropicalis 8364
+Monosiga brevicollis 81824
+arabidopsis thaliana

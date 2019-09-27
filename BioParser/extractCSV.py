@@ -20,6 +20,7 @@ arguments:
 import argparse
 import glob
 import os
+import re
 from os import path
 import csv
 import pickle
@@ -42,8 +43,10 @@ def readDirectory(files, headerlines):
     data = {}
     for f in files:
         filesize = os.stat(f).st_size
-        if os.path.isfile(f) and filesize > 1300:   # Only read files that are 1kb or greater
+       
+        if os.path.isfile(f) and filesize > 50:   # Only read files that are 1kb or greater
             name, info = readFile(f, headerlines)
+            
             if name != "":
                 data[name.lower()] = info
     return data   
@@ -65,6 +68,7 @@ def readFile(inputfile, headerlines):
         for row in reader:
             if not row[fields[2]] and not row[fields[1]]:
                 index = filelists[row[fields[0]]]
+                
             else:
                 info[index] = info[index] if index in info.keys() else []
                 if index == "pos_e":
@@ -92,24 +96,31 @@ def createDictionary(data):
 
 def parseArguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--files', required=True, type=glob.iglob,
+    parser.add_argument('--files', required=True, type=str,
         help="Pattern of files to read in. ['bioParser/csv/*.csv']")
     parser.add_argument('-outfile', type=str, default="model.p",
         help="Outfile to write condensed CSV information to.")
     parser.add_argument('-headerlines', type=int, default=5,
         help="Number of header lines to skip over.")
     return parser.parse_args()
-
+def findFiles(searchPara):
+    fileList = []
+    pathAndSearchPara = os.path.split(searchPara)
+ 
+    path  = os.getcwd().replace("\\", "/")
+    return [x.path for x in os.scandir(path + pathAndSearchPara[0]+"/") if x.name[-len(pathAndSearchPara[1][1:]):] == pathAndSearchPara[1][1:]]
+    
 
 if __name__ == "__main__":
     # Get all arguments from commandline
     args = parseArguments()
-    
-    # Read each csv file provided and extract all information
-    data = readDirectory(list(args.files), args.headerlines)
+    files = findFiles(args.files)
 
+    # Read each csv file provided and extract all information
+    data = readDirectory(files, args.headerlines)
+   
     # Store information in nested dictionary structure described above
     dicts = createDictionary(data)
-
     with open(args.outfile, 'wb') as f:
+ 
         pickle.dump(dicts, f)

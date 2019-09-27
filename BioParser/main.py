@@ -1,118 +1,156 @@
-#  import dependencies
-import argparse
-import datetime
-import time
+# Paul Houser, Milo Rupp, Raiden van Bronkhorst, Jordan Valgardson
+
+# 12/21/2018
+
+# This program parses the arguments necessary for proteome processing, and sets up necessary
+# folders, variables, and runs each proteome to be parsed in it's own thread.
+
+'''
+runInParallel
+python runInParallel.py -organisms all.txt -positions 1,3,4,5 -numResidues 6 -motifs P0:ILVF P2:ST -heatmaps -motifID motif1
+'''
+
 import os
-import math
-from structure import structure
-from parse import read_file
-from fileOutput import *
+import time
+import argparse
+import sys
+# from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from GenerateFileList import parseFileNames
+from summaryFileOutPut import summaryFile
 
+# handle command line arguments
 def parseArgs():
-    #  handle command line arguments
     parser = argparse.ArgumentParser(
-        description='Process C-terminal decameric matchingSequences')
-
-    parser.add_argument('file', metavar='file', type=str,
-                        nargs=1, help='The file to be parsed')
-    parser.add_argument('position', metavar='position', type=int,
-                        nargs=1, help='The position to search in')
-    parser.add_argument('numResidues', metavar='numResidues', type=int,
-                        nargs=1, help='The number of residues to provide statistics on.')
-    parser.add_argument('sort', metavar='sort', type=int,
-                        nargs=1, help='How to sort final output')
-    parser.add_argument('-o', action='store_true',
-                        help='Add this flag to enable file output.')
-    parser.add_argument('-q', action='store_true',
-                        help='Add this flag to silence printout of ratios')
-    parser.add_argument('inputValues', nargs='+',
-                        help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
+        description='Run C-terminal decameric sequence processing on many files simultaneously')
+    parser.add_argument('-organisms', required=True, type=str, 
+        help='The text file containing latin names of organisms. Usage: all.txt')
+    parser.add_argument('-positions', required=True, type=str, 
+        help='The positions to search over, delimited with commas. Usage: 1,3,4,5')
+    parser.add_argument('-numResidues', required=True, type=int, 
+        help='The number of residues to provide statistics on. Usage: 6')
+    parser.add_argument('-motifs', nargs='+',
+        help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
+    parser.add_argument('-c', action='store_true', default=False,
+        help='Add this flag to create combined CSVs.')
+    parser.add_argument('-heatmaps', action='store_true', default=False,
+        help='Add this flag to make enrichment heat maps for csv data.')
+    parser.add_argument('-motifID', type=str, default="motif",
+        help="If heatmaps are created, use this naming convention. Usage: motif1")
     return parser.parse_args()
 
+'''
+#RC NOTE: replaced with args.positions.split(',')
+# parses input to setup positions array
+def parsePositions():
+    positions = []
+    string = args.positions
+    stream = ""
+    # for each character in the input, if it's a digit, concatenate to number
+    # otherwise the number is done being read, add to positions
+    for i in range(0, len(string)):
+        if string[i].isdigit():
+            stream += string[i]
+        elif string[i] == ",":
+            positions.append(int(stream))
+            stream = ""
+    # add the last digit to the array, eliminates need for comma 1,2,3,4,5,6>,<
+    if (string[-1].isdigit()):
+        positions.append(int(string[-1]))
+    return list(set(positions))
+'''
 
-#  gets all important positions from args.inputValues and adds them to the list 'importantPositions'
-def getImportantPositions(inputValues):
-    importantPositions = []
-    for i in inputValues:
-        currentValue = []
-        currentPosition = ""
+#  creates necessary folders to put downloads, csv's, and combined data in.
+def makeFolders():
+    folders = ["csv", "fastas", "combinedCSVs", "sequenceLists","rawTSV"]
+    for folder in folders:
+        file_path = str(os.getcwd().replace("\\", "/")) + ("/%s" % folder)
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
 
-        for j in range(1, len(i)):
-            if i[j].isdigit():
-                currentPosition += i[j]
-            elif i[j] == ":":
-                currentValue.append(int(currentPosition))
-            else:
-                currentValue.append(i[j])
-        importantPositions.append(currentValue)
-    return importantPositions
 
-# sets up object containing all output information
-def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPositions, howToSort, silent, o):
-    for file in fileNames:
+def distributeWork(positions, fileNames, args):
+    callString = ""
+    for i in args.motifs:
+        callString += i + " "
 
-        # setup class
-        currentStructure = structure()
-        currentStructure.organism = file
-        currentStructure.numResidues = numResidues
-        currentStructure.searchPosition = searchPosition
-        currentStructure.pList = pList
-        currentStructure.importantPositions = importantPositions
-        currentStructure.howToSort = howToSort
+    # array of tasks to be completed
+    futures = []
 
-        # parse file
-        # if file cannot be found, add to unfound organisms
-        currentStructure = read_file(currentStructure)
-        if not (currentStructure):
-            unFoundOrgs(file.split(".")[0])
-            continue
-    
-        file = currentStructure.organism
-        # file writing
-        setupOutputFile(currentStructure)
-        printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at search position:",
-                currentStructure.freqMotifPositional, True, searchPosition, False, silent)
-        printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids in the last " + str(
-            currentStructure.numResidues) + " positions (non-redundant):", currentStructure.freqLastN, True, searchPosition, False, silent)
-        printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at the given position (non-redundant)",
-                currentStructure.freqAllPositional, True, searchPosition, False, silent)
-        printData("csv/" + file.split(".")[0] + ".csv", "Enrichment ratios for each amino acid at given position",
-                currentStructure.enrichment, False, searchPosition, howToSort, silent)
-        if (o):
-            printSequencesAndIdentifiers(currentStructure)
+    # open thread pool
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        for x in positions:
+            for i in fileNames:
+                
+                # submit tasks to be completed by threads
+                # print(sys.executable + " main.py " + i + " " + str(x) + " " + str(args.numResidues) + " 2 -o -q " + callString)
+                futures.append(executor.submit(os.system, (sys.executable + " setUpHandler.py " + i + " " + str(x) + " " + str(args.numResidues) + " 2 -o -q " + callString)))
+        # progress bar
+        # for f in tqdm(as_completed(futures), ncols=100, unit="%", total=(len(fileNames) * len(positions))):
+        #     pass
+
+"""
+createHeatmaps
+for each position provided, extract enrichments from the csv files and create heat map pngs for each position.
+organisms (list) -- organisms extracted from provided file
+motifID (str)    -- identifier for current motif
+positions (list) -- positions to create heat maps of
+"""
+def createHeatmaps(organisms, motifID, positions):
+    for p in positions:
+        infiles = '/csv/*' + p + '.csv'
+
+        pickle = motifID + '/' + 'position' + p + '.p'
+        title = motifID + '_position' + p
+        outfile = motifID + '/' + title + '.png'
+       
+        os.system(sys.executable + " extractCSV.py " + "--files " + infiles + " -outfile " + pickle)
+        os.system(sys.executable + " createHeatMap.py " + "--enrichment " + pickle + ' --out ' + outfile + ' -title ' + title + ' -organisms ' + organisms)
         
 
 if __name__ == "__main__":
     args = parseArgs()
+    start = time.clock()
+    positions = args.positions.split(',')
 
-    # creates the file to hold unfound organisms
-    path = str(os.getcwd()) + "/unfoundOrganisms.txt"
-    if not os.path.exists(path):
-        open(path, "w").close()
+    makeFolders()
 
-    # initializes howToSort based on command line input
-    # first value is 0,1 meaning key or value, second is reverse = true or false
-    # [0, False] is the default sort
-    howToSort = [0, False]
-    sort = args.sort[0]
-    if sort == 0:
-        howToSort = [1, False]
-    if sort == 1:
-        howToSort = [1, True]
-    if sort == 2:
-        howToSort = [0, False]
-    if sort == 3:
-        howToSort = [0, True]
+    # exit the program if it can't find the specified file
+    if not os.path.isfile(args.organisms):
+        print("Could not find file " + args.organisms + " to read.")
+        exit(1)
 
-    importantPositions = getImportantPositions(args.inputValues)
-    pList = []
-    for i in importantPositions:
-        pList.append(i[0])
+    #  creates file for unfound organisms
+    f = open("unfoundOrganisms.txt", "w")
+    f.write("Organisms not found on uniprot:\n\n")
+    f.close()
 
-    # start timer
-    startTime = time.clock()
+    # initialises temp.file so that other programs can know what the input file was , this is a weird solution come back to this
+    f = open("~temp.file",'w')
+    f.write(args.organisms[:-4]+"_verbose.txt")
+    f.close()
 
-    setUpStructure(args.file[0].split(","), args.numResidues[0], args.position[0], pList, importantPositions, howToSort, args.q, args.o)
+    open(args.organisms[:-4]+"_verbose.txt",'w').close()
+    distributeWork(positions, parseFileNames(args.organisms), args)
+   
+    os.remove("~temp.file")
+    with open(args.organisms[:-4]+"_verbose.txt",'r') as f:
+        uniqueLines = set(f.readlines())
 
-    if not args.q:
-        print("Parser completed in", round(time.clock() - startTime, 2), "seconds")
+    with open(args.organisms[:-4]+"_verbose.txt",'w') as f:
+        for line in sorted(uniqueLines):
+            f.write(line)
+    summaryFile("rawTSV/","sequenceLists/","summaryFile.csv")
+    # if the user supplies -heatmap flag, create heatmaps for each position provided
+    if args.heatmaps:
+        print("Creating heat maps...")
+        if not os.path.exists(args.motifID):
+            os.makedirs(args.motifID)
+        createHeatmaps(args.organisms, args.motifID, positions)
+
+    # if the user supplies -c flag, combine CSVs with combineData.py
+    if args.c:
+        print("Combining CSVs...")
+        os.system(sys.executable + " combineData.py " + str(args.organisms) + " " + str(args.positions))
+
+    print('All tasks completed in ' + str(round(time.clock() - start, 2)) + " seconds")

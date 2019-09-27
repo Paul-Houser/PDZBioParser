@@ -32,7 +32,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1 import AxesGrid
 from matplotlib import cm
 import matplotlib.pyplot as plt
-
+from GenerateFileList import parseFileNames
 #negative charge, positive charge, aromatic, aliphatic, polar, other
 aminoacids = [["D", "E"],["H", "K", "R"],["F", "W", "Y"],["A", "I", "L", "V"],["N", "Q", "S", "T"],["G", "P", "M", "C"]]
 
@@ -45,11 +45,16 @@ return list of extracted data and the ordered organisms found in pickle file
 """
 def getData(picklefile, organismfile):
     data = pickle.load(open(picklefile, "rb"))
+    
     organisms = sorted(list(data["all_f"].keys()))
+    
     if organismfile:
-        with open(organismfile, 'r') as f:
-            new_orgs = [line.strip().lower() for line in f.readlines()]
-            organisms = [o for o in new_orgs if o in organisms] 
+        
+        new_orgs = [o.split('.')[0].lower() for o in parseFileNames(organismfile)]
+    
+        organisms = [o for o in new_orgs if o.split('.')[0].lower() in organisms]
+        
+
     return data, organisms
 
 """
@@ -62,12 +67,14 @@ Limit the enrichment values displayed to the -0.2 to 2.2 range
 return numpy array containing enrichment values to display
 """
 def getEnrichmentArray(data, organisms, aminoacids):
+
     all_enrichment = []
     for amino in aminoacids:
         curr_enrichment = []
         for o in organisms:
             curr_values = []
             for a in amino:
+            
                 enrichmentvalue = float(data["pos_e"][o][a][0])
                 enrichmentvalue = 2.2 if enrichmentvalue > 2.2 else enrichmentvalue
                 enrichmentvalue = -0.2 if enrichmentvalue < -0.2 else enrichmentvalue
@@ -108,6 +115,7 @@ def getAnnotationArray(annotation_data, organisms, aminoacids, thresh):
 
 def heatmap(data, row_labels, col_labels, ax, cbar_kw={}, cbarlabel="", **kwargs):
     # Plot the heatmap
+
     im = ax.imshow(data, **kwargs)
 
     # Show x axis tickmarks (amino acid letters)
@@ -214,5 +222,6 @@ if __name__ == "__main__":
         annotations = getAnnotationArray(annotation, organisms, aminoacids, args.thresh)
         createPlot(enrichments, aminoacids, organisms, args.title, args.out, annot=annotations)
     else:
+       
         createPlot(enrichments, aminoacids, organisms, args.title, args.out)
 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #  bioParser
 #  Milo Rupp, Raiden van Bronkhorst, Paul Houser
 #  10/12/17
