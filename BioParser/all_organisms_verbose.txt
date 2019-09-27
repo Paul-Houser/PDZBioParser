@@ -1,16 +1,16 @@
-bos taurus 9913 
-caenorhabditis elegans 6239 
-callorhinchus milii 7868 
-danio rerio 7955
-dictyostelium discoideum 44689
-drosophila melanogaster 7227
+Monosiga brevicollis 81824 unreviewed
+arabidopsis thaliana 3702 unreviewed
+bos taurus 9913 unreviewed
+caenorhabditis elegans 6239 unreviewed
+callorhinchus milii 7868 unreviewed
+danio rerio 7955 unreviewed
+dictyostelium discoideum 44689 unreviewed
+drosophila melanogaster 7227 unreviewed
 escherichia coli 83333 reviewed
-gallus gallus 9031 
+gallus gallus 9031 unreviewed
 homo sapiens 9606 reviewed
-mus musculus 10090
-nematostella vectensis 45351
-rattus norvegicus 10116
+mus musculus 10090 unreviewed
+nematostella vectensis 45351 unreviewed
+rattus norvegicus 10116 unreviewed
 saccharomyces cerevisiae 559292 reviewed
-xenopus tropicalis 8364
-Monosiga brevicollis 81824
-arabidopsis thaliana
+xenopus tropicalis 8364 unreviewed
