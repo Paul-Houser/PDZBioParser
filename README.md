@@ -7,15 +7,18 @@ You can download fasta files from [here.](http://www.uniprot.org/proteomes)
 python 3,
 requests,
 numpy,
-matplotlib,
+matplotlib
+
 ## Usage
 ```
-MotifAnalyzer-PDZ.py [-h] -organisms ORGANISMS -positions POSITIONS
-                        -numResidues NUMRESIDUES
-                        [-inputValues INPUTVALUES [INPUTVALUES ...]] [-c]
-                        [-heatmaps] [-motifID MOTIFID]
+usage: main.py [-h] -organisms ORGANISMS -positions POSITIONS -numResidues
+               NUMRESIDUES [-motifs MOTIFS [MOTIFS ...]] [-c] [-heatmaps]
+               [-motifID MOTIFID]
 
-Arguments:
+Run C-terminal decameric sequence processing on many files simultaneously
+
+optional arguments:
+  -h, --help            show this help message and exit
   -organisms ORGANISMS  The text file containing latin names of organisms.
                         Usage: all.txt
   -positions POSITIONS  The positions to search over, delimited with commas.
@@ -23,13 +26,9 @@ Arguments:
   -numResidues NUMRESIDUES
                         The number of residues to provide statistics on.
                         Usage: 6
-  -inputValues INPUTVALUES [INPUTVALUES ...]
+  -motifs MOTIFS [MOTIFS ...]
                         The matching positions with desired amino acids.
                         Usage: P0:ILVF P2:ST ... PX:X
-
-
-
-Optional arguments:
   -c                    Add this flag to create combined CSVs.
   -heatmaps             Add this flag to make enrichment heat maps for csv
                         data.
@@ -58,7 +57,7 @@ homo sapiens 9606 reviewed
 # MotifMatcher
 # Reqirements
 Python3,
-lxml,
+lxml
 # Usage
 ```
 main.py [-h] -refOrganism REFORGANISM -sequenceFolder SEQUENCEFOLDER
