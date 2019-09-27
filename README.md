@@ -10,7 +10,7 @@ numpy,
 matplotlib,
 ## Usage
 ```
-main.py [-h] -organisms ORGANISMS -positions POSITIONS
+MotifAnalyzer-PDZ.py [-h] -organisms ORGANISMS -positions POSITIONS
                         -numResidues NUMRESIDUES
                         [-inputValues INPUTVALUES [INPUTVALUES ...]] [-c]
                         [-heatmaps] [-motifID MOTIFID]
