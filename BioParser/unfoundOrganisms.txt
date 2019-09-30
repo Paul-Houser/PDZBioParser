@@ -1,2 +1,0 @@
-Organisms not found on uniprot:
-
