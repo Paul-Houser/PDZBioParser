@@ -9,6 +9,15 @@ requests,
 numpy,
 matplotlib
 
+## Program Description
+BioParser is a tool used to process C-terminal decameric sequences, with the evaluation of PDZ binding domains as is primary goal. BioParser will filter and analyze the proteomes of as many organisms as are supplied to it, and will filter based off as many motifs as are supplied to it.
+
+Motifs refers to specifying specific amino acids at certain positions. For example, if you wanted to analyze the enrichment of the amino acids S and T at position 2, you could supply the -motifs argument with ``` P2:ST ```
+
+BioParser also creates detailed data on the proteomes that is stored in the CSV folder that is created during the programs execution. The -c argument combines all CSV's for one organism, which can be usefull when large numbers of positions are being processed.
+
+
+
 ## Usage
 ```
 usage: main.py [-h] -organisms ORGANISMS -positions POSITIONS -numResidues
@@ -37,8 +46,9 @@ optional arguments:
 Example usage:
 Linux:
 python3 main.py -organisms all_organisms.txt -motifs P0:WYIAfLVM P2:ST -positions 1,3,5 -numResidues 6
+
 Windows 10:
-runInParallel.py -organisms all_organisms.txt -numResidues 6 -motifs P0:WIYAFLVM P2:ST -positions 1,3,5
+python3 main.py -organisms all_organisms.txt -motifs P0:WIYAFLVM P2:ST -positions 1,3,5-numResidues 6
 
 ```
 
