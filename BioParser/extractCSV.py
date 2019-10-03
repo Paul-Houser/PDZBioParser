@@ -61,6 +61,7 @@ def readFile(inputfile, headerlines):
     info = {}
     with open(inputfile) as csvfile:
         organism = csvfile.readline().split()[2][:-2][:-4]
+        organism = '_'.join([organism.split('_')[0], organism.split('_')[1]])
         for i in range(headerlines-1): 
             csvfile.readline()
         reader = csv.DictReader(csvfile, delimiter=',')
@@ -118,9 +119,8 @@ if __name__ == "__main__":
 
     # Read each csv file provided and extract all information
     data = readDirectory(files, args.headerlines)
-   
+  
     # Store information in nested dictionary structure described above
     dicts = createDictionary(data)
-    with open(args.outfile, 'wb') as f:
- 
+    with open(args.outfile, 'wb') as f: 
         pickle.dump(dicts, f)

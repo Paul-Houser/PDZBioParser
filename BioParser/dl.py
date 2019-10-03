@@ -6,8 +6,6 @@
 
 import requests
 import os
-from GenerateFileList import reviewedToAPI
-from structure import structure
 # downloads missing files from uniprot, call with fasta name
 # example: getFasta("homo_sapiens.fasta",yes,True,taxonId=9606)
 
@@ -54,4 +52,8 @@ def getFasta(org,silent):
             return original
     
     return original
+
+def reviewedToAPI(x):
+    reviewedToAPI = {"reviewed" : "yes", "unreviewed" : "no"}
+    return reviewedToAPI[x]
 

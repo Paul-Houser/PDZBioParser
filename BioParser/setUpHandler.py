@@ -1,144 +1,124 @@
-# Paul Houser, Milo Rupp, Raiden van Bronkhorst, Jordan Valgardson
-
-# September, 2017
-
-# This program sets up variables and the structure object specific to the protein being parsed, and
-# then calls parse.py on the current organism.
-
-#  import dependencies
 import argparse
-import datetime
-import time
 import os
-import math
-from structure import structure
-from parse import read_file
-from fileOutput import *
+import time
+
+from parse import readFile
+from fileOutput import writeCSV, writeSequenceLists
+
+
+def getImportantPositions(motifs):
+    importantPositions = []
+    for m in motifs:
+        position, aminoacids = m.split(':')
+        currentPositions = [int(position[1])] + list(aminoacids)
+        importantPositions.append(currentPositions)
+    return importantPositions
+
+
+class structure(object):
+    def __init__(self):
+        aminoacids = ["G", "A", "V", "L", "I", "M", "S", "C", "T", "P", "F", "Y", "W", "H", "K", "R", "D", "E", "N", "Q", "X", "U", "Z", "B", "O"]
+        self.orgFile = ""
+        self.organism = "" # holds fasta name
+        self.numResidues = 0 
+        self.searchPosition = 0 
+        self.pList = []
+        self.importantPositions = []
+        self.sequences = [] # holds the *redundant* sequences that also match the motifs.
+        self.sequenceLabels = [] # labels for the above sequences from the fasta
+        self.freqAllPsnl = {a:0 for a in aminoacids} 
+        self.freqLastN = {a:0 for a in aminoacids}
+        self.freqMotifPositional  = {a:0 for a in aminoacids} 
+        # freqPositional is the same as freqAllPsnl but with redundancy removed
+        self.freqAllPositional = {a:0 for a in aminoacids}
+        self.freqNonRedMotifPositional  = {a:0 for a in aminoacids}
+        self.freqNonRedAllPositional = {a:0 for a in aminoacids}
+        self.enrichment = {a:0 for a in aminoacids}
+
+    # prints are for debugging purposes
+    def printStructure(self):
+        print("Organism: " + self.organism)
+        print("numResidues: " + self.numResidues)
+        print("searchPostion: " + self.numResidues)
+        print("pList: " + self.pList)
+        print("importantPositions: " + self.importantPositions)
+    
+    def printFrequencies(self):
+        print("freqAllPsnl: " + self.freqAllPsnl)
+        print("freqLastN: " + self.freqLastN)
+        print("freqPositional: " + self.freqNonRedMotifPositional)
+        print("enrichment: " + self.enrichment)
+
+
+
+def setUpStructure(filenames, numResidues, searchPosition, pList, importantPositions, o):
+    for curr_file in filenames:
+        #set up class
+        struct = structure()
+        struct.organism = curr_file
+        struct.numResidues = numResidues
+        struct.searchPosition = searchPosition
+        struct.pList = pList
+        struct.importantPositions = importantPositions
+
+        # parse file (if file cannot be found, add to unfound organisms)
+        ### readFile() is how parse.py gets called ###
+        
+        org = curr_file.split('.')[0]
+
+        struct = readFile(struct)
+
+        if not (struct):
+            with open('unfoundOrganisms.txt', 'a') as f:
+                f.write('{}\n'.format(org))
+            continue
+
+        # file writing
+        csv_file = 'csv/{}{}.csv'.format(struct.organism.split('.')[0], str(struct.searchPosition))
+        writeCSV(csv_file, struct)
+
+        if o:
+            seq_file = 'sequenceLists/{}.tsv'.format(struct.organism.split('.')[0])
+            writeSequenceLists(seq_file, struct)
+        
+
 
 def parseArgs():
-    #  handle command line arguments
     parser = argparse.ArgumentParser(
         description='Process C-terminal decameric matchingSequences')
-
-    parser.add_argument('file', metavar='file', type=str,
-                        nargs=1, help='The file to be parsed')
-    parser.add_argument('position', metavar='position', type=int,
-                        nargs=1, help='The position to search in')
-    parser.add_argument('numResidues', metavar='numResidues', type=int,
-                        nargs=1, help='The number of residues to provide statistics on.')
-    parser.add_argument('sort', metavar='sort', type=int,
-                        nargs=1, help='How to sort final output')
+    parser.add_argument('file', type=str,
+        help='The file to be parsed')
+    parser.add_argument('position', type=int,
+        help='The position to search in')
+    parser.add_argument('numResidues', type=int,
+        help='The number of residues to provide statistics on.')
+    parser.add_argument('sort', type=int,
+        help='How to sort final output')
     parser.add_argument('-o', action='store_true',
-                        help='Add this flag to enable file output.')
+        help='Add this flag to enable file output.')
     parser.add_argument('-q', action='store_true',
-                        help='Add this flag to silence printout of ratios')
+        help='Add this flag to silence printout of ratios')
     parser.add_argument('motifs', nargs='+',
-                        help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
+        help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
     return parser.parse_args()
 
 
-#  gets all important positions from args.motifs and adds them to the list 'importantPositions'
-def getImportantPositions(motifs):
-    importantPositions = []
-    for i in motifs:
-        currentValue = []
-        currentPosition = ""
-
-        for j in range(1, len(i)):
-            if i[j].isdigit():
-                currentPosition += i[j]
-            elif i[j] == ":":
-                currentValue.append(int(currentPosition))
-            else:
-                currentValue.append(i[j])
-        importantPositions.append(currentValue)
-    return importantPositions
-
-# sets up object containing all output information
-def setUpStructure(fileNames, numResidues, searchPosition, pList, importantPositions, howToSort, silent, o):
-    for file in fileNames:
-
-        # setup class
-        currentStructure = structure()
-        currentStructure.organism = file
-        currentStructure.numResidues = numResidues
-        currentStructure.searchPosition = searchPosition
-        currentStructure.pList = pList
-        currentStructure.importantPositions = importantPositions
-        currentStructure.howToSort = howToSort
-
-        # parse file
-        # if file cannot be found, add to unfound organisms
-
-        ###########################################
-        # read_file() is how parse.py gets called #
-        ###########################################
-        
-        currentStructure = read_file(currentStructure)
-        if not (currentStructure):
-            unFoundOrgs(file.split(".")[0])
-            continue
-       
-        file = currentStructure.organism
-
-        a = time.time()
-        # file writing
-        setupOutputFile(currentStructure)
-        printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at search position:",
-                currentStructure.freqMotifPositional, True, searchPosition, False, silent)
-        printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids in the last " + str(
-            currentStructure.numResidues) + " positions (non-redundant):", currentStructure.freqNonRedMotifPositional , True, searchPosition, False, silent)
-        
-        printData("csv/" + file.split(".")[0] + ".csv", "Frequencies of all amino acids at the given position (non-redundant)",
-                currentStructure.freqAllPositional, True, searchPosition, False, silent)
-        printData("csv/" + file.split(".")[0] + ".csv", "Enrichment ratios for each amino acid at given position",
-                currentStructure.enrichment, False, searchPosition, howToSort, silent)
-        if (o):
-            printSequencesAndIdentifiers(currentStructure)
-        
-        
-if __name__ == "__main__":
+def main():
     args = parseArgs()
-
-    # creates the file to hold unfound organisms
-    path = str(os.getcwd()) + "/unfoundOrganisms.txt"
-    if not os.path.exists(path):
-        open(path, "w").close()
-
-    ###################################################################
-    ###################################################################
-
-    #  IMPORTANT: this is no longer used in any user supplied arguments, and [0, False] is the only sort ever used.
-    #  I didn't delete it because it may be useful in future versions of PDZBioParser.
-    
-    # initializes howToSort based on command line input
-    # first value is 0,1 meaning key or value, second is reverse = true or false
-    # [0, False] is the default sort
-    howToSort = [0, False]
-    sort = args.sort[0]
-    if sort == 0:
-        howToSort = [1, False]
-    if sort == 1:
-        howToSort = [1, True]
-    if sort == 2:
-        howToSort = [0, False]
-    if sort == 3:
-        howToSort = [0, True]
-
-
-    ###################################################################
-    ###################################################################
-
 
     importantPositions = getImportantPositions(args.motifs)
     pList = []
     for i in importantPositions:
         pList.append(i[0])
 
-    # start timer
-    startTime = time.clock()
+    start = time.time()
 
-    setUpStructure(args.file[0].split(","), args.numResidues[0], args.position[0], pList, importantPositions, howToSort, args.q, args.o)
+    setUpStructure(args.file.split(','), args.numResidues, args.position, 
+                   pList, importantPositions, args.o)
 
     if not args.q:
-        print("Parser completed in", round(time.clock() - startTime, 2), "seconds")
+        print('Parser completed in {} seconds'.format(round(time.time() - start, 2)))
+
+
+if __name__ == '__main__':
+    main()

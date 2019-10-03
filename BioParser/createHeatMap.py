@@ -32,7 +32,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1 import AxesGrid
 from matplotlib import cm
 import matplotlib.pyplot as plt
-from GenerateFileList import parseFileNames
+from fileOutput import parseFileNames
+
 #negative charge, positive charge, aromatic, aliphatic, polar, other
 aminoacids = [["D", "E"],["H", "K", "R"],["F", "W", "Y"],["A", "I", "L", "V"],["N", "Q", "S", "T"],["G", "P", "M", "C"]]
 
@@ -45,15 +46,14 @@ return list of extracted data and the ordered organisms found in pickle file
 """
 def getData(picklefile, organismfile):
     data = pickle.load(open(picklefile, "rb"))
-    
+
     organisms = sorted(list(data["all_f"].keys()))
-    
+
     if organismfile:
-        
+        organism_filenames = parseFileNames(organismfile)    
         new_orgs = [o.split('.')[0].lower() for o in parseFileNames(organismfile)]
-    
+        new_orgs = ['_'.join([org.split('_')[0], org.split('_')[1]]) for org in new_orgs]
         organisms = [o for o in new_orgs if o.split('.')[0].lower() in organisms]
-        
 
     return data, organisms
 
@@ -74,7 +74,6 @@ def getEnrichmentArray(data, organisms, aminoacids):
         for o in organisms:
             curr_values = []
             for a in amino:
-            
                 enrichmentvalue = float(data["pos_e"][o][a][0])
                 enrichmentvalue = 2.2 if enrichmentvalue > 2.2 else enrichmentvalue
                 enrichmentvalue = -0.2 if enrichmentvalue < -0.2 else enrichmentvalue
@@ -115,7 +114,6 @@ def getAnnotationArray(annotation_data, organisms, aminoacids, thresh):
 
 def heatmap(data, row_labels, col_labels, ax, cbar_kw={}, cbarlabel="", **kwargs):
     # Plot the heatmap
-
     im = ax.imshow(data, **kwargs)
 
     # Show x axis tickmarks (amino acid letters)
@@ -214,7 +212,6 @@ if __name__ == "__main__":
     
     # Create array of enrichment values for heat map
     enrichments = getEnrichmentArray(data, organisms, aminoacids)
-    
     # If annotation is supplied, get array of annotations
     # Create heat map with enrichment values
     if args.annotation:
