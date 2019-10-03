@@ -1,3 +1,0 @@
-Monosiga_brevicollis 81824 unreviewed
-arabidopsis_thaliana 3702 unreviewed
-homo_sapiens 9606 reviewed
