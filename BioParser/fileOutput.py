@@ -2,6 +2,13 @@ from datetime import datetime
 import os
 
 def parseFileNames(organismfile):
+    ''' takes the organisms file and generates the names to use for the downloaded fastas.
+    
+        Pre conditions:
+            organismfile: string with the directory for the organism file
+        
+        Post conditions:
+            returns files: a list containing the names to be used for the fastas that will be downloaded. '''
     files = []
     with open(organismfile, 'r') as f:
         for line in f.readlines():
@@ -12,6 +19,13 @@ def parseFileNames(organismfile):
     return files
 
 def makeFolders(path='./'):
+    ''' creates the necessary directories for the results to be stored in.
+
+        Pre conditions:
+            path is a string with the location for the directories to be made
+        
+        Post conditions:
+            the directories have been created '''
     folders = ['csv', 'fastas', 'combinedCSVs', 'sequenceLists', 'rawTSV']
     for folder in folders:
         filepath = os.path.join(path, folder)
@@ -19,6 +33,14 @@ def makeFolders(path='./'):
             os.makedirs(filepath)
 
 def writeSummaryFile(rawFolder, filteredFolder, outfile):
+    ''' writeSummaryFile generates the summary file containing organism name, total motif matching proteins, and total proteins.
+
+        Pre conditions:
+            rawFolder and filteredFolder are the locations of the raw tsv's and filtered tsv's
+            outfile is the location to write the summary file
+        
+        Post conditions:
+            Summary file exists in the location specified by outfile '''
     with open(outfile, 'w') as f:
         rawLengths, filteredLengths = {}, {}
 
