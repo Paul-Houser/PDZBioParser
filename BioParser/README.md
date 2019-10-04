@@ -104,6 +104,7 @@ readFile calls getFasta from dl, and writeRawTSV from fileOutput
   - getFasta downloads the fasta from uniprot.org, and specifies reviewed or unreviewed.
 
 ## Program Output
+  For now, MotifMatcher-PDZ.py must be run from within the PDZBioParser/BioParser directory. All output will be created in this directory as well.
 
 ### csv
   Contains the number of occurrences and the percentage of the following:
