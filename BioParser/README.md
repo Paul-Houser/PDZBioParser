@@ -1,0 +1,54 @@
+# BioParser
+## Program Description
+BioParser is a tool used to process C-terminal decameric sequences, with the evaluation of PDZ binding domains as is primary goal. BioParser will filter and analyze the proteomes of as many organisms as are supplied to it, and will filter based off as many motifs as are supplied to it.
+
+Motifs refers to specifying specific amino acids at certain positions. For example, if you wanted to analyze the enrichment of the amino acids S and T at position 2, you could supply the -motifs argument with ``` P2:ST ```
+
+BioParser also creates detailed data on the proteomes that is stored in the CSV folder that is created during the programs execution. The -c argument combines all CSV's for one organism, which can be usefull when large numbers of positions are being processed.
+
+## Usage
+```
+usage: MotifAnalyzer-PDZ.py [-h] -organisms ORGANISMS -positions POSITIONS
+                            -numResidues NUMRESIDUES
+                            [-motifs MOTIFS [MOTIFS ...]] [-c] [-heatmaps]
+                            [-motifID MOTIFID]
+
+Run C-terminal decameric sequence processing on many files simultaneously
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -organisms ORGANISMS  The text file containing latin names of organisms.
+                        (e.g. organisms.txt)
+  -positions POSITIONS  The positions to search over, delimited with commas.
+                        (e.g. 1,3,4,5)
+  -numResidues NUMRESIDUES
+                        The number of residues to provide statistics on.
+                        (e.g. 6)
+  -motifs MOTIFS [MOTIFS ...]
+                        The matching positions with desired amino acids. 
+                        (e.g. P0:ILVF P2:ST ... PX:X)
+  -c                    Add this flag to create combined CSVs.
+  -heatmaps             Add this flag to make enrichment heat maps for csv data.
+  -motifID MOTIFID      If heatmaps are created, use this naming convention.
+                        [default=motif]
+```
+
+```
+example usage:
+python3 MotifAnalyzer-PDZ.py -organisms organisms.txt -positions 1,3 -numResidues 6 -motifs P0:ILVF P2:ST
+```
+## Argument Requirements
+-organisms.txt --- this File should contain the names of all organisms to be parsed, the taxon id and whether it is reviewed or unreviewed.
+General Structure:
+```
+Organism_Name TaxonID Reviewed
+```
+Example:
+```
+Homo_sapiens 9606 reviewed
+gallus_gallus 9031 unreviewed
+```
+
+## Package Requirements
+python3
+
