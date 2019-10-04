@@ -83,13 +83,27 @@ def parseArgs():
         help='Add this flag to make enrichment heat maps for csv data.')
     parser.add_argument('-motifID', type=str, default='motif',
         help='If heatmaps are created, use this naming convention. [default=motif1]')
-    parser.add_argument('-results', type=str, default='results',
-        help='Supply the path and directory to store all results to. [default=results]')
     return parser.parse_args()
 
 
+def checkInput(args):
+    assert os.path.exists(args.organisms), 'Could not find file: {}'.format(args.organisms)
+
+    pos = args.positions.split(',')
+    for p in pos:
+        assert p.isdigit(), 'Invalid position entered: {}'.format(p)
+
+    for mot in args.motifs:
+        m = mot.split(':')
+        assert len(m) == 2, 'Invalid motif entered: {}'.format(mot)
+        assert m[1] != '', 'Invalid motif entered: {}'.format(mot)
+        assert m[0][0].lower() == 'p', 'Invalid motif entered: {}'.format(mot)
+        assert m[0][1:].isdigit(), 'Invalid motif entered: {}'.format(mot)
+    
+
 def main():
     args = parseArgs()
+    checkInput(args)
     start = time.time()
     positions = args.positions.split(',')
 
