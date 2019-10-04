@@ -19,7 +19,7 @@ def readFile(struct, silent=True):
         # open fasta file and append sequences to a proteins and last N residues to last proteins last N
         for i in lines.split('\n>'):
             x = i.split('\n',1)
-            if len(x[1]) > struct.numResidues:
+            if len(x) > 1 and len(x[1]) > struct.numResidues:
                 sequence = x[1].replace('\n','')
                 proteins.append([x[0],sequence])
                 proteinsLastN.append([x[0],sequence[-struct.numResidues:]])
