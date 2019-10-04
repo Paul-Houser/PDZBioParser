@@ -6,10 +6,8 @@ from concurrent.futures import ThreadPoolExecutor
 from fileOutput import parseFileNames, makeFolders, writeSummaryFile
 
 def distributeWork(positions, fileNames, motifs, numResidues):
-    callString = ''
 
-    for i in motifs:
-        callString += i + ' '
+    motifs = ' '.join(motifs).upper()
 
     # array of tasks to be completed
     futures = []
@@ -20,7 +18,7 @@ def distributeWork(positions, fileNames, motifs, numResidues):
             for i in fileNames:
                 #submit tasks to be completed by threads
                 setup = ' setUpHandler.py {} {} {} 2 -o -q {}'.format(
-                        i, str(x), str(numResidues), callString)
+                        i, str(x), str(numResidues), motifs)
                 futures.append(executor.submit(os.system, (sys.executable + setup)))
 
 def createHeatmaps(organisms, motifID, positions):
