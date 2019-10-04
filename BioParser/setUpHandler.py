@@ -7,10 +7,15 @@ from fileOutput import writeCSV, writeSequenceLists
 
 
 def getImportantPositions(motifs):
+    '''
+    Extract the positions and amino acids from the motifs entered at run time.
+    :param motifs: (list) the motifs supplied (e.g. P0:ILVF)
+    :return: a list of lists containing the position followed by the amino acid letters.
+    '''
     importantPositions = []
     for m in motifs:
         position, aminoacids = m.split(':')
-        currentPositions = [int(position[1])] + list(aminoacids)
+        currentPositions = [int(position[1:])] + list(aminoacids)
         importantPositions.append(currentPositions)
     return importantPositions
 
@@ -52,6 +57,16 @@ class structure(object):
 
 
 def setUpStructure(filenames, numResidues, searchPosition, pList, importantPositions, o):
+    '''
+    Create the structure containing the organism, number of residues, given position,
+    and the motif information. Calculate and write output to the required directories.
+    :param filenames: (list) organisms provided by the user
+    :param numResidues: (int) the number of residues to provide statistics on.
+    :param searchPosition: (int) the current position of interest.
+    :param pList: (list) list of positions provided by the user.
+    :param importantPositions: (list) list of lists containing the position followed by the amino acid letters.
+    :o: (bool) flag to save tsv files containing the sequences.
+    '''
     for curr_file in filenames:
         #set up class
         struct = structure()
