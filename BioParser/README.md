@@ -73,6 +73,26 @@ gallus_gallus 9031 unreviewed
 ## Program Flow
 
 
+## Program Output
+
+### csv
+
+
+### sequenceLists
+
+
+### rawTSV
+
+
+### combinedCSVs
+
+
+### unfoundOrganisms.txt
+
+
+### summaryFile.csv
+
+
 ## Heat Maps
 Create heat maps displaying the enrichment values and optional statistical annotations.
 Can be run with MotifAnalyzer-PDZ.py by supplying the `-heatmaps` flag.
