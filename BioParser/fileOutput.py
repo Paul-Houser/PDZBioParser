@@ -26,7 +26,7 @@ def makeFolders(path='./'):
         
         Post conditions:
             the directories have been created '''
-    folders = ['csv', 'fastas', 'combinedCSVs', 'sequenceLists', 'rawTSV']
+    folders = ['csv', 'fastas', 'sequenceLists', 'rawTSV']
     for folder in folders:
         filepath = os.path.join(path, folder)
         if not os.path.exists(filepath):
