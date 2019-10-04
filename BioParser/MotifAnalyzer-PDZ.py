@@ -5,7 +5,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from fileOutput import parseFileNames, makeFolders, writeSummaryFile
 
-def distributeWork(positions, fileNames, motifs, numResidues):
+def distributeWork(positions, fileNames, motifs, numResidues, q=False):
     ''' 
     Calls setUpHandler.py for each position and organism supplied with the motifs and numResidues.
     The threads are run in parallel to reduce time requirements.
@@ -20,8 +20,9 @@ def distributeWork(positions, fileNames, motifs, numResidues):
         for x in positions:
             for i in fileNames:
                 #submit tasks to be completed by threads
-                setup = ' setUpHandler.py {} {} {} 2 -o -q {}'.format(
-                        i, str(x), str(numResidues), motifs)
+                silence = '-q' if q else ''
+                setup = ' setUpHandler.py {} {} {} 2 -o {} {}'.format(
+                        i, str(x), str(numResidues), silence, motifs)
                 futures.append(executor.submit(os.system, (sys.executable + setup)))
 
 def createHeatmaps(organisms, motifID, positions):
@@ -109,6 +110,8 @@ def parseArgs():
         help='The matching positions with desired amino acids. (e.g. P0:ILVF P2:ST ... PX:X)')
     parser.add_argument('-c', action='store_true',
         help='Add this flag to create combined CSVs.')
+    parser.add_argument('-q', action='store_true',
+        help='Add this flag to quiet the command line arguments')
     parser.add_argument('-heatmaps', action='store_true',
         help='Add this flag to make enrichment heat maps for csv data.')
     parser.add_argument('-motifID', type=str, default='motif',
@@ -122,20 +125,14 @@ def main():
     start = time.time()
     positions = args.positions.split(',')
 
-    # exit the program if it cannot find the specified files
-    if not os.path.exists(args.organisms):
-        print('Could not find file: {}'.format(args.organisms))
-        exit(1)
-
     makeFolders()
     with open('unfoundOrganisms.txt', 'w') as f:
         f.write('Organisms not found in uniprot:\n\n')
     
-
     organism_filenames = parseFileNames(args.organisms)
-    distributeWork(positions, organism_filenames, args.motifs, args.numResidues)
+    distributeWork(positions, organism_filenames, args.motifs, args.numResidues, q=args.q)
 
-    writeSummaryFile('rawTSV/', 'sequenceLists/', 'summaryFile.csv')
+    writeSummaryFile('rawTSV/', 'sequenceLists/', 'summaryFile.csv', q=args.q)
 
     # if the user supplies -heatmap flag, create heatmaps for each position provided
     if args.heatmaps:

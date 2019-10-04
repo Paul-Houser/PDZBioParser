@@ -132,7 +132,8 @@ def main():
                    pList, importantPositions, args.o)
 
     if not args.q:
-        print('Parser completed in {} seconds'.format(round(time.time() - start, 2)))
+        organism = '_'.join([args.file.split('_')[0], args.file.split('_')[1]])
+        print('Position {} for organism {} completed in {} seconds'.format(args.position, organism, round(time.time() - start, 2)))
 
 
 if __name__ == '__main__':

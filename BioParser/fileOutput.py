@@ -32,7 +32,7 @@ def makeFolders(path='./'):
         if not os.path.exists(filepath):
             os.makedirs(filepath)
 
-def writeSummaryFile(rawFolder, filteredFolder, outfile):
+def writeSummaryFile(rawFolder, filteredFolder, outfile, q=False):
     ''' writeSummaryFile generates the summary file containing organism name, total motif matching proteins, and total proteins.
 
         Pre conditions:
@@ -57,9 +57,9 @@ def writeSummaryFile(rawFolder, filteredFolder, outfile):
             output = '{},{},{}\n'.format(organism, str(filteredLengths[organism]),
                                          str(rawLengths[organism]))
             f.write(output)
-    
 
-def writeCSV(filename, struct):
+
+def writeCSV(filename, struct, q=False):
     headers = ['Frequencies of all amino acids at search position:',
     'Frequencies of all amino acids in the last {} positions (non-redundant):'.format(str(struct.numResidues)),
     'Frequencies of all amino acids at the given position (non-redundant)']
@@ -111,10 +111,9 @@ def writeSequenceLists(filename, struct):
         for i in range(0, len(struct.sequences)):
             f.write('{}\t{}\n'.format(struct.sequences[i], struct.sequenceLabels[i]))
 
-
 def writeRawTSV(filename, proteinsLastN):
     writefile = 'rawTSV/{}.tsv'.format(filename.split('.')[0])
     with open(writefile, 'w') as f:
         f.write('Sequence:\tIdentifier:\n')
         for i in range(0, len(proteinsLastN)):
-            f.write('{}\t{}\n'.format(proteinsLastN[i][0], proteinsLastN[i][1]))       
+            f.write('{}\t{}\n'.format(proteinsLastN[i][0], proteinsLastN[i][1]))
