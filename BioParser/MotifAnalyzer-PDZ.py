@@ -6,7 +6,10 @@ from concurrent.futures import ThreadPoolExecutor
 from fileOutput import parseFileNames, makeFolders, writeSummaryFile
 
 def distributeWork(positions, fileNames, motifs, numResidues):
-
+    ''' 
+    Calls setUpHandler.py for each position and organism supplied with the motifs and numResidues.
+    The threads are run in parallel to reduce time requirements.
+    '''
     motifs = ' '.join(motifs).upper()
 
     # array of tasks to be completed
@@ -22,6 +25,10 @@ def distributeWork(positions, fileNames, motifs, numResidues):
                 futures.append(executor.submit(os.system, (sys.executable + setup)))
 
 def createHeatmaps(organisms, motifID, positions):
+    '''
+    Grabs the generated csv files and runs both extractCSV.py and createHeatmap.py.
+    Saves the generated heat map pngs.
+    '''
     for p in positions:
         infiles = '/csv/*{}.csv'.format(p)
         
@@ -51,9 +58,16 @@ def writeData(read, write, index):
             fw.write(',,,,')
 
 def combineData(filenames, positions):
+    '''
+    Creates combinedCSVs directory and reads in the data from the separate csv files. 
+    '''
     folderPos = os.getcwd()
+    directory = '{}/combinedCSVs'.format(folderPos)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
     for pos in positions.split(','):
-        write_file = '{}/combinedCSVs/combined{}.csv'.format(folderPos, pos)
+        write_file = '{}/combined{}.csv'.format(directory, pos)
         open(write_file, 'w').close()
         for index in range(115):
             for org_file in filenames:
@@ -64,27 +78,10 @@ def combineData(filenames, positions):
                 f.write('\n')
 
 
-def parseArgs():
-    parser = argparse.ArgumentParser(
-        description='Run C-terminal decameric sequence processing on many files simultaneously')
-    parser.add_argument('-organisms', required=True, type=str,
-        help='The text file containing latin names of organisms. Usage: all.txt')
-    parser.add_argument('-positions', required=True, type=str,
-        help='The positions to search over, delimited with commas. Usage: 1,3,4,5')
-    parser.add_argument('-numResidues', required=True, type=int,
-        help='The number of residues to provide statistics on. Usage: 6')
-    parser.add_argument('-motifs', nargs='+',
-        help='The matching positions with desired amino acids. Usage: P0:ILVF P2:ST ... PX:X')
-    parser.add_argument('-c', action='store_true',
-        help='Add this flag to create combined CSVs.')
-    parser.add_argument('-heatmaps', action='store_true',
-        help='Add this flag to make enrichment heat maps for csv data.')
-    parser.add_argument('-motifID', type=str, default='motif',
-        help='If heatmaps are created, use this naming convention. [default=motif1]')
-    return parser.parse_args()
-
-
 def checkInput(args):
+    '''
+    Ensure the arguments entered by the user are valid, exit the program otherwise
+    '''
     assert os.path.exists(args.organisms), 'Could not find file: {}'.format(args.organisms)
 
     pos = args.positions.split(',')
@@ -97,7 +94,27 @@ def checkInput(args):
         assert m[1] != '', 'Invalid motif entered: {}'.format(mot)
         assert m[0][0].lower() == 'p', 'Invalid motif entered: {}'.format(mot)
         assert m[0][1:].isdigit(), 'Invalid motif entered: {}'.format(mot)
-    
+
+
+def parseArgs():
+    parser = argparse.ArgumentParser(
+        description='Run C-terminal decameric sequence processing on many files simultaneously')
+    parser.add_argument('-organisms', required=True, type=str,
+        help='The text file containing latin names of organisms. (e.g. organisms.txt)')
+    parser.add_argument('-positions', required=True, type=str,
+        help='The positions to search over, delimited with commas. (e.g. 1,3,4,5)')
+    parser.add_argument('-numResidues', required=True, type=int,
+        help='The number of residues to provide statistics on. (e.g. 6)')
+    parser.add_argument('-motifs', nargs='+',
+        help='The matching positions with desired amino acids. (e.g. P0:ILVF P2:ST ... PX:X)')
+    parser.add_argument('-c', action='store_true',
+        help='Add this flag to create combined CSVs.')
+    parser.add_argument('-heatmaps', action='store_true',
+        help='Add this flag to make enrichment heat maps for csv data.')
+    parser.add_argument('-motifID', type=str, default='motif',
+        help='If heat maps are created, use this naming convention. [default=motif]')
+    return parser.parse_args()
+
 
 def main():
     args = parseArgs()
