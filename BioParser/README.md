@@ -89,8 +89,19 @@ readFile calls getFasta from dl, and writeRawTSV from fileOutput
 
   - The arguments provided by the call from distributeWork in MotifAnalyzer-PDZ.py are parsed.
   - getImportantPositions is called. This takes the motif arguments provided and extracts the positions and their associated amino acids. Returns a list of lists. for example, P0:ILVF and P2:ST returns ```[[0, I, L, V, F], [2, S, T]]```
-  - setUpStructure is called. This Creates the structure object containing the organism, number of residues, given position, and the motif information. it uses readFile from parse.py to do this. It also Calculates and writes the output to the csv file, tsv file, and unfoundOrganisms.txt. (unfoundOrganisms.txt is generated if it doesn't already exist).
+  - setUpStructure is called. This creates the structure object containing the organism, number of residues, given position, and the motif information. it uses readFile from parse.py to do this. It also calculates and writes the output to the csv file, tsv file, and unfoundOrganisms.txt. (unfoundOrganisms.txt is generated if it doesn't already exist).
 
+#### parse.py:
+
+  - parse.py begins execution by the call to readFile in setUpHandler.py. 
+  - From dl.py, getFasta is called with the current organism being parsed. (see dl.py subheading)
+  - From fileOutput.py, writeRawTSV is called. This generates the statistics on the entire proteome before any processing.
+  - processFile is called. This records the frequency of each amino acid in each protein, the frequency of each amino acid for the non redundant proteins, and the frequency  of each amino acid for all the motif matching non redundant proteins.
+  - findEnrichment is called, which uses the frequencies found by processFile to get the enrichment values.
+
+#### dl.py
+
+  - getFasta downloads the fasta from uniprot.org, and specifies reviewed or unreviewed.
 
 ## Program Output
 
