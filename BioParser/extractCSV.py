@@ -98,12 +98,13 @@ def createDictionary(data):
 def parseArguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--files', required=True, type=str,
-        help="Pattern of files to read in. ['bioParser/csv/*.csv']")
+        help="Path to csv files to read in. (e.g. 'csv/*.csv')")
     parser.add_argument('-outfile', type=str, default="model.p",
-        help="Outfile to write condensed CSV information to.")
+        help="File to write condensed enrichment CSV information to [default=model.p].")
     parser.add_argument('-headerlines', type=int, default=5,
-        help="Number of header lines to skip over.")
+        help="Number of header lines to skip over [default=5].")
     return parser.parse_args()
+
 def findFiles(searchPara):
     fileList = []
     pathAndSearchPara = os.path.split(searchPara)

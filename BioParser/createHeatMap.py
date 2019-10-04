@@ -188,17 +188,17 @@ def createPlot(enrichment, aminoacids, organisms, title, outfile, annot=False):
 
 def parseArguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--enrichment", required="store_true", type=str,
+    parser.add_argument("--enrichment", required=True, type=str,
         help="Pickle file to read enrichment values from.")
     parser.add_argument("-organisms", type=str,
         help="Ordered organisms to use in plot.")
     parser.add_argument("-annotation", type=str,
         help="Pickle file containing the statistically significant values")
     parser.add_argument("-thresh", type=float, default=0.05,
-        help="Threshold value to for the annotations of the plot.")
+        help="Threshold value to for the annotations of the plot if the annotation pickle file is provided [default=0.5].")
     parser.add_argument("-title", type=str, default="Enrichment Values",
-        help="Title for plot.")
-    parser.add_argument("--out", required="store_true", type=str,
+        help="Title for plot [default=Enrichment Values].")
+    parser.add_argument("--out", required=True, type=str,
         help="png file to write plot to.")
     return parser.parse_args()
 
