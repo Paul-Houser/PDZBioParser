@@ -71,6 +71,25 @@ gallus_gallus 9031 unreviewed
 ```
 
 ## Program Flow
+User calls MotifAnalyzer-PDZ.py
+MotifAnalyzer-PDZ.py calls functions from fileOutput.py -- parseFileNames, makeFolders, writeSummaryFile, as well as setUpHandler.py.
+setUpHandler.py calls functions from fileOutput.py -- writeCSV and writeSequenceLists., as well as readFile from parse.py.
+readFile calls getFasta from dl, and writeRawTSV from fileOutput
+#### MotifAnalyzer-PDZ.py:
+
+  - First calls are to parseArgs and checkInput. These just make sure the arguments entered by the user are valid, and exits the program if they aren't.
+  - From fileOutput.py, makeFolders is called. This creates the necessary directories for the results to be stored in. These directories are 'csv', 'fastas', 'sequenceLists', and 'rawTSV'.
+  - From fileOutput.py, parseFileNames is called. This takes the organism names and information from the user provided text file, and generates the name for each fasta that will be downloaded.
+  - distributeWork is called, which starts multiple threads to analyze the proteomes, so that more than one can be processed at once. distributeWork calls setupHandler.py.
+  - Once distributeWork has finished executing, writeSummaryFile from fileOutput.py is called. writeSummaryFile generates a summary file containing organism names, numbers of motif matching proteins, and total number of proteins for each organism.
+  - createHeatmaps is called. This takes the csv files that were generated, and calls extractCSV.py, as well as createHeatMap.py.
+  - if the -c flag was provided by the user, combineData is called. This creates the combinedCSV directory and reads in the data from the separate csv files.
+
+#### setUpHandler.py:
+
+  - The arguments provided by the call from distributeWork in MotifAnalyzer-PDZ.py are parsed.
+  - getImportantPositions is called. This takes the motif arguments provided and extracts the positions and their associated amino acids. Returns a list of lists. for example, P0:ILVF and P2:ST returns ```[[0, I, L, V, F], [2, S, T]]```
+  - setUpStructure is called. This Creates the structure object containing the organism, number of residues, given position, and the motif information. it uses readFile from parse.py to do this. It also Calculates and writes the output to the csv file, tsv file, and unfoundOrganisms.txt. (unfoundOrganisms.txt is generated if it doesn't already exist).
 
 
 ## Program Output

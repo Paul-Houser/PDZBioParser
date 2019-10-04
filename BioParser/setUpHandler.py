@@ -75,12 +75,11 @@ def setUpStructure(filenames, numResidues, searchPosition, pList, importantPosit
         struct.searchPosition = searchPosition
         struct.pList = pList
         struct.importantPositions = importantPositions
-
-        # parse file (if file cannot be found, add to unfound organisms)
-        ### readFile() is how parse.py gets called ###
         
         org = curr_file.split('.')[0]
-
+        
+         # parse file (if file cannot be found, add to unfound organisms)
+        ### readFile() is how parse.py gets called ###
         struct = readFile(struct)
 
         if not (struct):
