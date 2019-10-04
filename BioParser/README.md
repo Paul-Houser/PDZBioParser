@@ -6,6 +6,25 @@ Motifs refers to specifying specific amino acids at certain positions. For examp
 
 BioParser also creates detailed data on the proteomes that is stored in the CSV folder that is created during the programs execution. The -c argument combines all CSV's for one organism, which can be usefull when large numbers of positions are being processed.
 
+## Package Requirements
+```
+python3
+requests == 2.20.1
+numpy == 1.15.4     --- required if generating heat maps
+matplotlib == 3.0.2 --- required if generating heat maps
+```
+
+It is recommended that the user run MotifAnalyzer-PDZ.py within a virtual environment. 
+The steps to start up a virtual environment are listed below. The requirements.txt included
+contains all required python3 packages to be downloaded within the virtual environment.
+
+Virtual Environment Setup:
+```
+virtualenv -p python3 .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 ## Usage
 ```
 usage: MotifAnalyzer-PDZ.py [-h] -organisms ORGANISMS -positions POSITIONS
@@ -35,10 +54,10 @@ optional arguments:
 
 ```
 Example usage:
-python3 MotifAnalyzer-PDZ.py -organisms organisms.txt -positions 1,3 -numResidues 6 -motifs P0:ILVF P2:ST
+python3 MotifAnalyzer-PDZ.py -organisms organisms.txt -positions 1,3 -numResidues 6 -motifs P0:I P2:ST
 ```
-## Organism Text File
--organisms.txt --- this file should contain the names of all organisms to be parsed, the taxon id and whether it is reviewed or unreviewed.
+
+The organism text file should contain the names of all organisms to be parsed, the taxon id and whether it is reviewed or unreviewed.
 
 General Structure:
 ```
@@ -49,25 +68,6 @@ Example:
 ```
 Homo_sapiens 9606 reviewed
 gallus_gallus 9031 unreviewed
-```
-
-## Package Requirements
-```
-python3
-requests == 2.20.1
-numpy == 1.15.4     --- required if generating heat maps
-matplotlib == 3.0.2 --- required if generating heat maps
-```
-
-It is recommended that the user run MotifAnalyzer-PDZ.py within a virtual environment. 
-The steps to start up a virtual environment are listed below. The requirements.txt included
-contains all required python3 packages to be downloaded within the virtual environment.
-
-Virtual Environment Setup:
-```
-virtualenv -p python3 .venv
-source .venv/bin/activate
-pip install -r requirements.txt
 ```
 
 ## Program Flow
@@ -82,7 +82,8 @@ for the generated files with the `-motifID` argument.
 ### Running from MotifAnalyzer-PDZ
 Example usage:
 ```
-python3 MotifAnalyzer-PDZ.py -organisms organisms.txt -positions 1,3 -numResidues 6 -motifs P0:ILVF P2:ST -heatmaps -motifID my_motif
+python3 MotifAnalyzer-PDZ.py -organisms organisms.txt -positions 1,3 -numResidues 6 -motifs P0:I P2:ST -heatmaps -motifID my_motif
+```
 
 ### Running Otherwise
 First run extractCSV.py to read in data formatted with MotifAnalyzer-PDZ.py.
