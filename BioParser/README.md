@@ -75,56 +75,12 @@ gallus_gallus 9031 unreviewed
 
 ## Heat Maps
 Create heat maps displaying the enrichment values and optional statistical annotations.
-Can be run with MotifAnalyzer-PDZ.py by supplying the `-heatmaps` flag or separately.
+Can be run with MotifAnalyzer-PDZ.py by supplying the `-heatmaps` flag.
 If running from MotifAnalyzer-PDZ.py, the user has the option to supply a naming convention 
 for the generated files with the `-motifID` argument.
 
-### Running from MotifAnalyzer-PDZ
 Example usage:
 ```
 python3 MotifAnalyzer-PDZ.py -organisms organisms.txt -positions 1,3 -numResidues 6 -motifs P0:I P2:ST -heatmaps -motifID my_motif
 ```
 
-### Running Otherwise
-First run extractCSV.py to read in data formatted with MotifAnalyzer-PDZ.py.
-```
-usage: extractCSV.py [-h] --files FILES [-outfile OUTFILE]
-                     [-headerlines HEADERLINES]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --files FILES         Path to csv files to read in. (e.g. 'csv/*.csv')
-  -outfile OUTFILE      File to write condensed enrichment CSV information to
-                        [default=model.p].
-  -headerlines HEADERLINES
-                        Number of header lines to skip over [default=5].
-```
-
-Example usage:
-```
-python3 extractCSV.py --files 'csv/*.csv' -outfile model.p
-```
-
-Once extractCSV.py has run, then run createHeatMap.py to create and save heatmaps.
-
-```
-usage: createHeatMap.py [-h] --enrichment ENRICHMENT [-organisms ORGANISMS]
-                        [-annotation ANNOTATION] [-thresh THRESH]
-                        [-title TITLE] --out OUT
-optional arguments:
-  -h, --help            show this help message and exit
-  --enrichment ENRICHMENT
-                        Pickle file to read enrichment values from.
-  -organisms ORGANISMS  Ordered organisms to use in plot.
-  -annotation ANNOTATION
-                        Pickle file containing the statistically significant
-                        values
-  -thresh THRESH        Threshold value to for the annotations of the plot.
-  -title TITLE          Title for plot.
-  --out OUT             png file to write plot to.
-```
-
-Example usage:
-```
-python3 createHeatMap.py --enrichment model_motif1/position1.p --out m1_p1.png
-```
