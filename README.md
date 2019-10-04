@@ -1,73 +1,15 @@
 # PDZBioParser
 # BioParser
-## fasta files
-You can download fasta files from [here.](http://www.uniprot.org/proteomes)
-
-## Requirements
-python 3,
-requests,
-numpy,
-matplotlib
-
-## Program Description
 BioParser is a tool used to process C-terminal decameric sequences, with the evaluation of PDZ binding domains as is primary goal. BioParser will filter and analyze the proteomes of as many organisms as are supplied to it, and will filter based off as many motifs as are supplied to it.
 
 Motifs refers to specifying specific amino acids at certain positions. For example, if you wanted to analyze the enrichment of the amino acids S and T at position 2, you could supply the -motifs argument with ``` P2:ST ```
 
 BioParser also creates detailed data on the proteomes that is stored in the CSV folder that is created during the programs execution. The -c argument combines all CSV's for one organism, which can be usefull when large numbers of positions are being processed.
 
-
-
-## Usage
-```
-usage: main.py [-h] -organisms ORGANISMS -positions POSITIONS -numResidues
-               NUMRESIDUES [-motifs MOTIFS [MOTIFS ...]] [-c] [-heatmaps]
-               [-motifID MOTIFID]
-
-Run C-terminal decameric sequence processing on many files simultaneously
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -organisms ORGANISMS  The text file containing latin names of organisms.
-                        Usage: all.txt
-  -positions POSITIONS  The positions to search over, delimited with commas.
-                        Usage: 1,3,4,5
-  -numResidues NUMRESIDUES
-                        The number of residues to provide statistics on.
-                        Usage: 6
-  -motifs MOTIFS [MOTIFS ...]
-                        The matching positions with desired amino acids.
-                        Usage: P0:ILVF P2:ST ... PX:X
-  -c                    Add this flag to create combined CSVs.
-  -heatmaps             Add this flag to make enrichment heat maps for csv
-                        data.
-  -motifID MOTIFID      If heatmaps are created, use this naming convention.
-                        Usage: motif1
-Example usage:
-Linux:
-python3 main.py -organisms all_organisms.txt -motifs P0:WYIAfLVM P2:ST -positions 1,3,5 -numResidues 6
-
-Windows 10:
-python3 main.py -organisms all_organisms.txt -motifs P0:WIYAFLVM P2:ST -positions 1,3,5-numResidues 6
-
-```
-
-BEFORE USE: update the file 'organisms_list.txt' to contain the names of all 
-organisms to be parsed, each on their own line. 
-General Structure:
-```
-Name TaxonID Reviewed/Unreviewed
-
-Example.
-bos taurus 9913 unreviewed
-caenorhabditis elegans 6239 unreviewed
-escherichia coli 83333 reviewed
-homo sapiens 9606 reviewed
-```
 # MotifMatcher
 # Reqirements
-Python3,
-lxml
+Python3
+
 # Usage
 ```
 main.py [-h] -refOrganism REFORGANISM -sequenceFolder SEQUENCEFOLDER
