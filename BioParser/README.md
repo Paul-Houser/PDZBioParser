@@ -106,21 +106,26 @@ readFile calls getFasta from dl, and writeRawTSV from fileOutput
 ## Program Output
 
 ### csv
-
+  Contains the number of occurrences and the percentage of the following:
+    - Amino acids at search position
+    - Amino acids in the last X positions (non-redundant)
+    - Amino acids at the given position (non-redundant)
+   As well as the enrichment ratios for each amino acid at the given position.
 
 ### sequenceLists
-
+  Contains TSV's for each organism. The TSV's contain the sequence identifier along with the last X amino acids of the protein.
 
 ### rawTSV
-
+  Contains statistics on the proteome before any processing has occured.
 
 ### combinedCSVs
-
+  This is all of the csv's generated for a specific position of interest.
 
 ### unfoundOrganisms.txt
-
+  This is a list of the organisms that couldn't be found/downloaded from uniprot.org.
 
 ### summaryFile.csv
+  This is a summary of the most recent execution of the program. It contains the names of the fastas that were processed and the number of motif matching proteins and total proteins for each organism.
 
 
 ## Heat Maps
