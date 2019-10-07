@@ -108,9 +108,11 @@ readFile calls getFasta from dl, and writeRawTSV from fileOutput
 
 ### csv
   Contains the number of occurrences and the percentage of the following:
+  
     - Amino acids at search position
     - Amino acids in the last X positions (non-redundant)
     - Amino acids at the given position (non-redundant)
+    
    As well as the enrichment ratios for each amino acid at the given position.
 
 ### sequenceLists
